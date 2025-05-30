@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>TRMNL Dashboard</title>
+    <link rel="stylesheet" href="https://usetrmnl.com/css/1.1.0/plugins.css">
+    <script src="https://usetrmnl.com/js/1.1.0/plugins.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
+    <script src="plugin.js"></script>
+</head>
+
+<body>
+    <div class="trmnl screen screen--no-bleed screen--full-width">
+        <div class="view view--full">
+            <div class="layout layout--top">
+                <div class="stretch-y">
+
+                    <div class="columns py--12">
+                        <div class="column text--center">
+                            <div class="item">
+                                <div class="meta"></div>
+                                <div class="content">
+                                    <span class="value value--large" id="metric-pollen-count"
+                                        data-value-fit="true">##</span>
+                                    <span class="label label--medium">Pollen Count</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="item">
+                                <div class="meta"></div>
+                                <div class="content">
+                                    <span class="value value--medium" id="metric-pollen-type"
+                                        data-value-fit="true">#######, ######</span>
+                                    <span class="label label--medium">Type</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column text--center">
+                            <div class="item">
+                                <div class="meta"></div>
+                                <div class="content">
+                                    <span class="value value--large" id="metric-aqi" data-value-fit="true">##</span>
+                                    <span class="label label--medium">AQI</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table--condensed" id="pollen-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <span class="title title--small">Date</span>
+                                </th>
+                                <th>
+                                    <span class="title title--small text--center">Pollen Count</span>
+                                </th>
+                                <th>
+                                    <span class="title title--small">Type</span>
+                                </th>
+                                <th>
+                                    <span class="title title--small text--center">AQI</span>
+                                </th>
+                                <th>
+                                    &nbsp;
+                                </th>
+                                <th>
+                                    <span class="title title--small">Contributor</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="pollen-tbody">
+                            <td colspan="5" class="p--32">
+                                <span class="title text--center">Loading ...</span>
+                            </td>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="title_bar bg--gray-6">
+                <img class="image image-stroke image-stroke--xlarge"
+                    src="https://upload.wikimedia.org/wikipedia/commons/0/08/Flower-of-Life-small.svg" />
+                <span class="title">Nashville Pollen &amp; Air Quality</span>
+                <span class="instance">data.nashville.gov</span>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
