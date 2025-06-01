@@ -2,9 +2,6 @@
 // Extend this as needed for TRMNL API integration or custom logic
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Example: Show a console message when the plugin loads
-  console.log('TRMNL Dashboard plugin loaded.');
-
   // Render rows of Pollen Table
   const renderPollenTable = (pollen) => {
     const tbody = document.getElementById('pollen-tbody');

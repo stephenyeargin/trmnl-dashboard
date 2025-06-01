@@ -1,0 +1,10 @@
+{
+  "name": "Wego Bus Maps",
+  "version": "1.0.0",
+  "description": "A dashboard showing a route and next bus times at a set of stops.",
+  "author": "Stephen Yeargin",
+  "main": "index.html",
+  "icon": "https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/src/resources/logo.svg",
+  "keywords": ["bus", "transit", "nashville"],
+  "trmnlPlugin": true
+}

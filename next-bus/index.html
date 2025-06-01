@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>TRMNL Dashboard</title>
+        <link rel="stylesheet" href="https://usetrmnl.com/css/1.1.0/plugins.css">
+        <script src="https://usetrmnl.com/js/1.1.0/plugins.js"></script>
+        <script src="plugin.js"></script>
+    </head>
+
+    <body>
+        <div class="trmnl screen screen--no-bleed screen--full-width">
+            <div class="view view--full">
+                <div class="layout layout--top">
+                    <div class="stretch-y">
+
+                        <div style="max-width: 420px">
+
+                            <div class="item mb--4">
+                                <div class="meta"></div>
+                                <div class="content">
+                                    <span class="label label--medium">Route</span>
+                                    <span id="route-name" class="value value--medium" data-value-fit="true">-</span>
+                                </div>
+                            </div>
+                            <div class="item mb--4">
+                                <div class="meta"></div>
+                                <div class="content">
+                                    <span class="label label--medium">Stop</span>
+                                    <span id="stop-name" class="value value--small" data-value-fit="true">-</span>
+                                </div>
+                            </div>
+                            <div class="item mb--4">
+                                <div class="meta"></div>
+                                <div class="content">
+                                    <span class="label label--medium">Next Trip</span>
+                                    <span id="trip-name" class="value value--small" data-value-fit="true">-</span>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="meta"></div>
+                                <div class="content">
+                                    <span class="label label--medium">Departs</span>
+                                    <span id="next-stop-time" class="value value--small" data-value-fit="true">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="item" style="flex:1; min-width: 320px; max-width: 50%; display: flex; align-items: center; justify-content: center;">
+                        <div id="wego-map" class="border--v-7 h--full"></div>
+                    </div>
+                </div>
+
+                <!-- Alerts go here -->
+                <div id="alerts-list" class="richtext gap--large columns"></div>
+
+                <div class="title_bar bg--gray-6">
+                    <img class="image" src="https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/src/resources/logo.svg"/>
+                    <span class="title">WeGo Public Transit</span>
+                    <span class="instance">Next Bus</span>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>
