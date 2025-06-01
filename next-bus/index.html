@@ -13,6 +13,25 @@
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
         <!-- Mapbox GL JS -->
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+
+        <style>
+          html, body, .screen, .view--full, .layout--row, .wego-map, #wego-map-canvas {
+            height: 100%;
+            min-height: 0;
+          }
+          .wego-map {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+          }
+          #wego-map-canvas {
+            flex: 1 1 auto;
+            height: 100%;
+            min-height: 220px;
+            max-width: 600px;
+            border-radius: 12px;
+          }
+        </style>
     </head>
 
     <body>
@@ -58,10 +77,10 @@
                             </div>
 
                         </div>
-                        <div class="item" style="flex:1; min-width: 320px; max-width: 50%; display: flex; align-items: center; justify-content: center;">
-                            <div id="wego-map" class="wego-map h--full" style="position: relative; width: 100%; height: 320px; min-height: 220px; max-width: 600px; margin: 0 auto;">
-                                <div id="wego-map-canvas" style="width: 100%; height: 320px; min-height: 220px; max-width: 600px; border-radius: 12px;"></div>
-                            </div>
+                        <div class="item" style="flex:1; min-width: 320px; max-width: 50%; display: flex; align-items: center; justify-content: center; height: 100%;">
+                          <div id="wego-map" class="wego-map h--full" style="position: relative; width: 100%; height: 100%; max-width: 600px; margin: 0 auto;">
+                            <div id="wego-map-canvas" style="width: 100%; height: 100%; min-height: 220px; max-width: 600px; border-radius: 12px;"></div>
+                          </div>
                         </div>
                     </div>
 
