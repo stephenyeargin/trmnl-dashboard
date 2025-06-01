@@ -10,13 +10,18 @@ let transitMap = null;
 document.addEventListener('DOMContentLoaded', async function() {
   transitMap = new TransitMap('wego-map-canvas', MAPBOX_TOKEN).initialize();
 
-  async function loadStopAndTrips() {
-    const stop = await fetchStop(STOP_ID);
-    const trips = await fetchTrips(STOP_ID);
-    return [{ stop, trips }];
+  async function loadStopTripsAndUpdates() {
+    // Fetch stop, trips, and trip updates in parallel
+    const [stop, trips, tripUpdates] = await Promise.all([
+      fetchStop(STOP_ID),
+      fetchTrips(STOP_ID),
+      fetchTripUpdates()
+    ]);
+    return { stop, trips, tripUpdates };
   };
 
-  const renderStopAndTrip = (stop, trip, route, timeToNext) => {
+  // Update function signature to accept scheduledDeparture and delayText
+  const renderStopAndTrip = (stop, trip, route, timeToNext, delayText, scheduledDeparture) => {
     const routeItem = document.getElementById('route-name')?.closest('.item');
     const departsItem = document.getElementById('next-stop-time')?.closest('.item');
     const stopNameEl = document.getElementById('stop-name');
@@ -61,18 +66,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     tripNameEl.textContent = tripName + (route ? ` (${route.route_long_name || route.route_short_name || ''})` : '');
 
     // Render the next departure time
-    if (!trip?.stop_times?.length) {
-      stopTimesContainer.textContent = 'No stop times available';
-      return;
-    }
-
-    const nextDepartureTime = findNextDepartureTime(trip.stop_times);
-    if (!nextDepartureTime) {
+    if (!timeToNext) {
       stopTimesContainer.textContent = 'No more stops today';
       return;
     }
-
-    stopTimesContainer.textContent = `${formatTime(nextDepartureTime)} (${timeToNext || ''})`;
+    stopTimesContainer.innerHTML = `${formatTime(scheduledDeparture)} <span class="label label--small">(${timeToNext}${delayText ? ', ' + delayText : ''})</span>`;
   };
 
   function getTimeUntilNextStop(trip) {
@@ -81,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     return nextDepartureTime ? getTimeUntil(nextDepartureTime) : null;
   }
 
-  const renderMap = (shape, stop, tripGid) => {
+  const renderMap = (shape, stop, tripGid, routeColor) => {
     if (!shape?.points?.length) {
       const mapContainer = document.getElementById('wego-map-canvas');
       if (mapContainer) {
@@ -89,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       return;
     }
-    transitMap?.render(shape, stop, tripGid);
+    transitMap?.render(shape, stop, tripGid, routeColor);
   };
 
   function findNextTrip(trips) {
@@ -141,24 +139,61 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
 
-  loadStopAndTrips().then(async (stopsWithTrips) => {
-    if (!stopsWithTrips?.length) return;
-    
-    const { stop, trips } = stopsWithTrips[0];
+  // Helper to fetch trip updates
+  async function fetchTripUpdates() {
+    try {
+      const resp = await fetch('https://gtfs.transitnownash.org/realtime/trip_updates.json');
+      return await resp.json();
+    } catch (e) {
+      console.error('Error fetching trip updates:', e);
+      return [];
+    }
+  }
+
+  // Helper to format lateness/earliness
+  function formatDelay(scheduled, realtime) {
+    if (!scheduled || !realtime) return '';
+    const diffSec = realtime - Math.floor(scheduled.getTime() / 1000);
+    if (Math.abs(diffSec) < 60) return 'on time';
+    const min = Math.round(Math.abs(diffSec) / 60);
+    return diffSec > 0 ? `${min} min late` : `${min} min early`;
+  }
+
+  loadStopTripsAndUpdates().then(async ({ stop, trips, tripUpdates }) => {
+    if (!stop || !trips) return;
     const nextTrip = findNextTrip(trips);
-    
     let route = null;
     if (nextTrip?.route_gid) {
+      // Fetch route and alerts only if we have a next trip
       route = await fetchRoute(nextTrip.route_gid);
     }
-
-    const timeToNext = getTimeUntilNextStop(nextTrip);
-    renderStopAndTrip(stop, nextTrip, route, timeToNext);
-    
-    if (nextTrip?.shape) {
-      renderMap(nextTrip.shape, stop, nextTrip.trip_gid);
+    // Real-time trip update logic
+    let tripUpdate = tripUpdates.find(tu => tu.trip_update?.trip?.trip_id === nextTrip?.trip_gid);
+    let nextStopTime = nextTrip?.stop_times?.find(st => {
+      const dep = parseTime(st.departure_time);
+      return dep && dep > new Date();
+    });
+    let scheduledDeparture = nextStopTime ? parseTime(nextStopTime.departure_time) : null;
+    let realtimeDeparture = null;
+    let delayText = '';
+    if (tripUpdate && nextStopTime) {
+      const stuArr = tripUpdate.trip_update?.stop_time_update || [];
+      const stu = stuArr.find(
+        s => String(s.stop_id).trim() === String(nextStopTime.stop_gid).trim() && s.departure && s.departure.time
+      );
+      if (stu && scheduledDeparture) {
+        realtimeDeparture = stu.departure.time;
+        const realtimeDate = new Date(realtimeDeparture * 1000);
+        delayText = formatDelay(scheduledDeparture, realtimeDeparture);
+        scheduledDeparture = realtimeDate;
+      }
     }
-    
+    const timeToNext = scheduledDeparture ? getTimeUntil(scheduledDeparture) : null;
+    renderStopAndTrip(stop, nextTrip, route, timeToNext, delayText, scheduledDeparture);
+    if (nextTrip?.shape) {
+      const routeColor = route?.route_color ? `#${route.route_color}` : undefined;
+      renderMap(nextTrip.shape, stop, nextTrip.trip_gid, routeColor);
+    }
     if (route) {
       const alerts = await fetchAlerts(route.route_gid);
       renderAlerts(alerts);

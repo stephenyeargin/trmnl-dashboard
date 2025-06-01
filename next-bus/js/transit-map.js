@@ -18,12 +18,12 @@ function createArrowImage() {
     const left = padding;
     const right = canvas.width - padding;
     
-    // Draw white border triangle with larger offset
+    // Draw white border triangle with even larger offset for thicker border
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.moveTo(middle, top - 2);  // top middle
-    ctx.lineTo(right + 2, bottom + 2);  // bottom right
-    ctx.lineTo(left - 2, bottom + 2);   // bottom left
+    ctx.moveTo(middle, top - 4);  // top middle
+    ctx.lineTo(right + 4, bottom + 4);  // bottom right
+    ctx.lineTo(left - 4, bottom + 4);   // bottom left
     ctx.closePath();
     ctx.fill();
     
@@ -82,7 +82,7 @@ export class TransitMap {
         }
     }
 
-    async render(shape, stop, tripGid) {
+    async render(shape, stop, tripGid, routeColor) {
         if (!this.map || !shape?.points?.length) {
             return;
         }
@@ -113,7 +113,7 @@ export class TransitMap {
         } catch (e) {}
 
         const addLayers = async () => {
-            this._addRouteLayer(lineCoords);
+            this._addRouteLayer(lineCoords, routeColor);
             if (stopFeature) {
                 this._addStopMarker(stopFeature);
             }
@@ -255,7 +255,7 @@ export class TransitMap {
         };
     }
 
-    _addRouteLayer(coordinates) {
+    _addRouteLayer(coordinates, routeColor) {
         this.map.addSource('route', {
             type: 'geojson',
             data: {
@@ -271,7 +271,7 @@ export class TransitMap {
             source: 'route',
             layout: { 'line-cap': 'round', 'line-join': 'round' },
             paint: {
-                'line-color': '#1a237e',
+                'line-color': routeColor || '#1a237e',
                 'line-width': 6
             }
         });
