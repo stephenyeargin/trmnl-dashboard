@@ -4,6 +4,8 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Render rows of Pollen Table
   const renderPollenTable = (pollen) => {
+    if (!pollen) return;
+
     const tbody = document.getElementById('pollen-tbody');
     tbody.innerHTML = '';
     pollen.slice(1, 6).forEach((row) => {
@@ -99,6 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   const renderTopMetrics = (pollen) => {
+    if (!pollen) return;
+
     const pollenType = document.getElementById('metric-pollen-type');
     const todaysMetrics = pollen[0];
     const forecastHeading = document.getElementById('forecast-heading');
@@ -125,6 +129,9 @@ document.addEventListener('DOMContentLoaded', function() {
   fetch('https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Air_Quality_and_Pollen_Count_1/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson')
     .then(response => response.json())
     .then(data => {
+      // Sort by ReportDateTime in descending order
+      data.features.sort((a, b) => new Date(b.properties.ReportDateTime) - new Date(a.properties.ReportDateTime));
+
       window.pollen = data.features;
       renderTopMetrics(data.features);
       renderPollenTable(data.features);

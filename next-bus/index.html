@@ -3,66 +3,79 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>TRMNL Dashboard</title>
-        <link rel="stylesheet" href="https://usetrmnl.com/css/1.1.0/plugins.css">
-        <script src="https://usetrmnl.com/js/1.1.0/plugins.js"></script>
-        <script src="plugin.js"></script>
+        <title>WeGo Next Bus</title>
+        <link rel="stylesheet" href="https://usetrmnl.com/css/latest/plugins.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;350;375;400;450;600;700&display=swap" rel="stylesheet">
+
+        <!-- Mapbox GL JS CSS -->
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+        <!-- Mapbox GL JS -->
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     </head>
 
     <body>
-        <div class="trmnl screen screen--no-bleed screen--full-width">
-            <div class="view view--full">
-                <div class="layout layout--top">
-                    <div class="stretch-y">
+        <body class="environment trmnl">
+            <div class="screen">
+                <div class="view view--full">
+                    <div class="layout layout--row">
+                        <div class="stretch-y">
 
-                        <div style="max-width: 420px">
+                            <div style="max-width: 450px">
 
-                            <div class="item mb--4">
-                                <div class="meta"></div>
-                                <div class="content">
-                                    <span class="label label--medium">Route</span>
-                                    <span id="route-name" class="value value--medium" data-value-fit="true">-</span>
+                                <div class="item mb--4">
+                                    <div class="meta"></div>
+                                    <div class="content">
+                                        <span class="label label--medium">Route</span>
+                                        <span id="route-name" class="value value--medium" data-value-fit="true">-</span>
+                                    </div>
+                                </div>
+                                <div class="item mb--4">
+                                    <div class="meta"></div>
+                                    <div class="content">
+                                        <span class="label label--medium">Stop</span>
+                                        <span id="stop-name" class="value value--small" data-value-fit="true">-</span>
+                                    </div>
+                                </div>
+                                <div class="item mb--4">
+                                    <div class="meta"></div>
+                                    <div class="content">
+                                        <span class="label label--medium">Next Trip</span>
+                                        <span id="trip-name" class="value value--small" data-value-fit="true">-</span>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <div class="meta"></div>
+                                    <div class="content">
+                                        <span class="label label--medium">Departs</span>
+                                        <span id="next-stop-time" class="value value--small" data-value-fit="true">-</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="item mb--4">
-                                <div class="meta"></div>
-                                <div class="content">
-                                    <span class="label label--medium">Stop</span>
-                                    <span id="stop-name" class="value value--small" data-value-fit="true">-</span>
-                                </div>
-                            </div>
-                            <div class="item mb--4">
-                                <div class="meta"></div>
-                                <div class="content">
-                                    <span class="label label--medium">Next Trip</span>
-                                    <span id="trip-name" class="value value--small" data-value-fit="true">-</span>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="meta"></div>
-                                <div class="content">
-                                    <span class="label label--medium">Departs</span>
-                                    <span id="next-stop-time" class="value value--small" data-value-fit="true">-</span>
-                                </div>
+
+                        </div>
+                        <div class="item" style="flex:1; min-width: 320px; max-width: 50%; display: flex; align-items: center; justify-content: center;">
+                            <div id="wego-map" class="wego-map h--full" style="position: relative; width: 100%; height: 320px; min-height: 220px; max-width: 600px; margin: 0 auto;">
+                                <div id="wego-map-canvas" style="width: 100%; height: 320px; min-height: 220px; max-width: 600px; border-radius: 12px;"></div>
                             </div>
                         </div>
-
                     </div>
-                    <div class="item" style="flex:1; min-width: 320px; max-width: 50%; display: flex; align-items: center; justify-content: center;">
-                        <div id="wego-map" class="border--v-7 h--full"></div>
+
+                    <!-- Alerts go here -->
+                    <div id="alerts-list" class="richtext gap--small columns"></div>
+
+                    <div class="title_bar">
+                        <img class="image" src="https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/src/resources/logo.svg"/>
+                        <span class="title">WeGo Public Transit</span>
+                        <span class="instance">Next Bus</span>
                     </div>
-                </div>
-
-                <!-- Alerts go here -->
-                <div id="alerts-list" class="richtext gap--large columns"></div>
-
-                <div class="title_bar bg--gray-6">
-                    <img class="image" src="https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/src/resources/logo.svg"/>
-                    <span class="title">WeGo Public Transit</span>
-                    <span class="instance">Next Bus</span>
                 </div>
             </div>
         </div>
+
+        <!-- Move plugin.js to end of body for proper loading order -->
+        <script src="plugin.js"></script>
     </body>
 
 </html>

@@ -1,6 +1,8 @@
 // Set it to ?stop=:value or use default
 const STOP_ID = new URLSearchParams(window?.location?.search)?.get('stop') || 'PORGRESF';
 
+const MAPBOX_TOKEN = 'pk.eyJ1Ijoic3RlcGhlbnllYXJnaW4iLCJhIjoiY2tobnVwczF0MDQ2dDJ0cXF3cHprZWhmciJ9.ScjCsGrht5g5AtAHMC28Iw';
+
 document.addEventListener('DOMContentLoaded', function() {
 
   const fetchNearbyStopsAndTrips = async () => {
@@ -91,16 +93,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   const renderMap = (shape, stop) => {
-    const mapContainer = document.getElementById('wego-map');
-    mapContainer.innerHTML = '';
-    // Simple SVG polyline for shape
-    const pointsArr = shape?.points || [];
-    if (!Array.isArray(pointsArr) || pointsArr.length === 0) {
-      mapContainer.innerHTML = '<span class="label label--small">No shape data</span>';
-      return;
+    // Use Mapbox GL JS to render the map, route, and stop
+    if (!window.mapboxgl) return;
+    const mapContainer = document.getElementById('wego-map-canvas');
+    if (!mapContainer) return;
+    // Remove any previous map instance
+    if (window._wegoMapInstance) {
+      window._wegoMapInstance.remove();
+      window._wegoMapInstance = null;
     }
-    // Normalize lat/lng to fit SVG viewBox
-    // Ensure input is parsed as numbers and use correct property names (lat/lon instead of shape_pt_lat/shape_pt_lon)
+    // Prepare GeoJSON for the route
+    const pointsArr = shape?.points || [];
     const validPoints = pointsArr.map(pt => ({
       lat: typeof pt.lat === 'number' ? pt.lat : parseFloat(pt.lat),
       lon: typeof pt.lon === 'number' ? pt.lon : parseFloat(pt.lon)
@@ -111,49 +114,91 @@ document.addEventListener('DOMContentLoaded', function() {
       !isNaN(pt.lon)
     );
     if (validPoints.length === 0) {
-      mapContainer.innerHTML = '<span class="label label--small">No valid shape data</span>';
+      mapContainer.innerHTML = '<span class="label label--small">No shape data</span>';
       return;
     }
+    const lineCoords = validPoints.map(pt => [pt.lon, pt.lat]);
+    // Center and bounds
     const lats = validPoints.map(pt => pt.lat);
     const lngs = validPoints.map(pt => pt.lon);
     const minLat = Math.min(...lats), maxLat = Math.max(...lats);
     const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
-    const padding = 20; // px
-    const width = 300, height = 300;
-    const innerWidth = width - 2 * padding;
-    const innerHeight = height - 2 * padding;
-    const points = validPoints.map(pt => {
-      const x = (maxLng - minLng) === 0 ? width/2 : padding + ((pt.lon - minLng) / (maxLng - minLng)) * innerWidth;
-      const y = (maxLat - minLat) === 0 ? height/2 : height - padding - ((pt.lat - minLat) / (maxLat - minLat)) * innerHeight;
-      return `${x},${y}`;
-    }).join(' ');
-    mapContainer.innerHTML = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-      <polyline points="${points}" fill="none" stroke="#1a237e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>`;
-    // Plot stop as a star in a circle
-    if (typeof stop === 'object' && stop.stop_lat	 && stop.stop_lon) {
-      const stopLat = typeof stop.stop_lat === 'number' ? stop.stop_lat	 : parseFloat(stop.stop_lat	);
+    const bounds = [[minLng, minLat], [maxLng, maxLat]];
+    // Stop marker
+    let stopFeature = null;
+    if (stop && stop.stop_lat && stop.stop_lon) {
+      const stopLat = typeof stop.stop_lat === 'number' ? stop.stop_lat : parseFloat(stop.stop_lat);
       const stopLon = typeof stop.stop_lon === 'number' ? stop.stop_lon : parseFloat(stop.stop_lon);
       if (!isNaN(stopLat) && !isNaN(stopLon)) {
-        const x = (maxLng - minLng) === 0 ? width/2 : padding + ((stopLon - minLng) / (maxLng - minLng)) * innerWidth;
-        const y = (maxLat - minLat) === 0 ? height/2 : height - padding - ((stopLat - minLat) / (maxLat - minLat)) * innerHeight;
-        // SVG star path centered at (x, y)
-        const rOuter = 14, rInner = 6, n = 5;
-        let starPath = '';
-        for (let i = 0; i < 2 * n; i++) {
-          const r = i % 2 === 0 ? rOuter : rInner;
-          const angle = Math.PI / n * i - Math.PI / 2;
-          const sx = x + r * Math.cos(angle);
-          const sy = y + r * Math.sin(angle);
-          starPath += (i === 0 ? 'M' : 'L') + sx + ',' + sy;
-        }
-        starPath += 'Z';
-        // Insert star and circle on top of polyline
-        mapContainer.querySelector('svg').innerHTML += `
-          <path d="${starPath}" fill="#000" stroke="#FFF" stroke-width="2" />
-        `;
+        stopFeature = {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [stopLon, stopLat] },
+          properties: {}
+        };
       }
     }
+    // Initialize Mapbox map
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+    const map = new mapboxgl.Map({
+      container: mapContainer,
+      style: 'mapbox://styles/mapbox/light-v11',
+      interactive: false,
+      attributionControl: false,
+      preserveDrawingBuffer: true
+    });
+    window._wegoMapInstance = map;
+    map.fitBounds(bounds, { padding: 40, duration: 0 });
+    map.on('load', () => {
+      // Add route line
+      map.addSource('route', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: { type: 'LineString', coordinates: lineCoords },
+          properties: {}
+        }
+      });
+      map.addLayer({
+        id: 'route-line',
+        type: 'line',
+        source: 'route',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': '#1a237e',
+          'line-width': 6
+        }
+      });
+      // Add stop as a circle marker (more reliable than SVG)
+      if (stopFeature) {
+        console.log('Adding stop marker at', stopFeature.geometry.coordinates);
+        map.addSource('stop', {
+          type: 'geojson',
+          data: stopFeature
+        });
+        // Add white border circle
+        map.addLayer({
+          id: 'stop-border',
+          type: 'circle',
+          source: 'stop',
+          paint: {
+            'circle-radius': 8,
+            'circle-color': '#ffffff',
+            'circle-stroke-width': 0
+          }
+        });
+        // Add black inner circle
+        map.addLayer({
+          id: 'stop-marker',
+          type: 'circle',
+          source: 'stop',
+          paint: {
+            'circle-radius': 6,
+            'circle-color': '#000000',
+            'circle-stroke-width': 0
+          }
+        });
+      }
+    });
   };
 
   // Find the next trip based on the soonest stop_times[0].departure_time after now (local time)
@@ -222,20 +267,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const description = alerts[0].alert.description_text?.translation?.[0]?.text || '';
     const item = document.createElement('div');
     item.className = 'item mb--2';
-    // .meta and .content structure
-    const meta = document.createElement('div');
-    meta.className = 'meta';
     const headlineDiv = document.createElement('div');
     headlineDiv.className = 'title title--small';
     headlineDiv.textContent = headline;
     const descriptionDiv = document.createElement('div');
-    descriptionDiv.className = 'description';
+    descriptionDiv.className = 'description clamp--2';
     descriptionDiv.textContent = description;
     const content = document.createElement('div');
-    content.className = 'content';
+    content.className = '';
     content.appendChild(headlineDiv);
     content.appendChild(descriptionDiv);
-    item.appendChild(meta);
     item.appendChild(content);
     alertsContainer.appendChild(item);
     if (alerts.length > 1) {
