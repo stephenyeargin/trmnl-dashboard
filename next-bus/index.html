@@ -19,6 +19,9 @@
         <body class="environment trmnl">
             <div class="screen">
                 <div class="view view--full">
+                    <!-- Alerts go here -->
+                    <div id="alerts-list" class="richtext columns gap--none"></div>
+
                     <div class="layout layout--row">
                         <div class="stretch-y">
 
@@ -62,9 +65,6 @@
                         </div>
                     </div>
 
-                    <!-- Alerts go here -->
-                    <div id="alerts-list" class="richtext gap--small columns"></div>
-
                     <div class="title_bar">
                         <img class="image" src="https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/src/resources/logo.svg"/>
                         <span class="title">WeGo Public Transit</span>
@@ -74,8 +74,8 @@
             </div>
         </div>
 
-        <!-- Move plugin.js to end of body for proper loading order -->
-        <script src="plugin.js"></script>
+        <!-- Load plugin.js as an ES module -->
+        <script type="module" src="plugin.js"></script>
     </body>
 
 </html>
