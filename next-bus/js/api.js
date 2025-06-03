@@ -7,7 +7,7 @@ export async function fetchStop(stopId) {
 }
 
 export async function fetchTrips(stopId) {
-    const tripsUrl = `https://gtfs.transitnownash.org/stops/${stopId}/trips.json`;
+    const tripsUrl = `https://gtfs.transitnownash.org/stops/${stopId}/trips.json?per_page=200`;
     const tripsResp = await fetch(tripsUrl);
     const tripsData = await tripsResp.json();
     return tripsData.data || [];
