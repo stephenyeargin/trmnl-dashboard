@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>NFD Active Incidents</title>
+        <link rel="stylesheet" href="https://usetrmnl.com/css/latest/plugins.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;350;375;400;450;600;700&display=swap" rel="stylesheet">
+        <script src="plugin.js"></script>
+    </head>
+    <body class="environment trmnl">
+        <div class="screen">
+            <div class="view view--full">
+                <div class="layout layout--row">
+                    <div class="column">
+                        <table class="table table--condensed" id="dispatch-table" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <span class="label label--small">Incident</span></th>
+                                    <th>
+                                        <span class="label label--small">Reported</span></th>
+                                    <th>
+                                        <span class="label label--small">Zip Code</span></th>
+                                    <th>
+                                        <span class="label label--small">Units Dispatched</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="dispatch-tbody">
+                                <tr>
+                                    <td colspan="5" class="text--center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="title_bar">
+                    <img class="image" src="https://www.nashville.gov/sites/default/files/styles/crop_card/public/2021-04/nfd-dept-header-logo.png" style="height: 40px;"/>
+                    <span class="title">NFD Active incidents</span>
+                    <span class="instance">data.nashville.gov</span>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

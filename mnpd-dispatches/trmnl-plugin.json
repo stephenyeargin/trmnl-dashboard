@@ -1,0 +1,10 @@
+{
+  "name": "MNPD Active Dispatches",
+  "version": "1.0.0",
+  "description": "A dashboard showing recent dispatches for the Metro Nashville Police Department",
+  "author": "Stephen Yeargin",
+  "main": "index.html",
+  "icon": "https://www.nashville.gov/sites/default/files/styles/crop_card/public/2021-05/mnpd-home-page-logo_1.png",
+  "keywords": ["police", "crime", "nashville"],
+  "trmnlPlugin": true
+}

@@ -1,4 +1,5 @@
-#!/bin/zsh
+#!/bin/sh
+
 # Simple dev server for TRMNL dashboards
 
 # Use Python 3's http.server for static serving
