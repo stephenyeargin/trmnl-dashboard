@@ -5,6 +5,10 @@
   "author": "Stephen Yeargin",
   "main": "index.html",
   "icon": "https://www.nashville.gov/sites/default/files/styles/crop_card/public/2021-04/nfd-dept-header-logo.png?itok=Y1-b-z7i",
-  "keywords": ["fire", "ambulance", "nashville"],
+  "keywords": [
+    "fire",
+    "ambulance",
+    "nashville"
+  ],
   "trmnlPlugin": true
 }

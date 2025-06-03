@@ -5,6 +5,11 @@
   "author": "Your Name",
   "main": "index.html",
   "icon": "https://upload.wikimedia.org/wikipedia/commons/0/08/Flower-of-Life-small.svg",
-  "keywords": ["dashboard", "pollen", "aqi", "nashville"],
+  "keywords": [
+    "dashboard",
+    "pollen",
+    "aqi",
+    "nashville"
+  ],
   "trmnlPlugin": true
 }

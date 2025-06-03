@@ -1,7 +1,7 @@
 // Basic plugin initialization for TRMNL Dashboard
 // Extend this as needed for TRMNL API integration or custom logic
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   // Render rows of Pollen Table
   const renderPollenTable = (pollen) => {
     if (!pollen) return;

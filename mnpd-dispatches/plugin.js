@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const tbody = document.getElementById('dispatch-tbody');
         tbody.innerHTML = '';
         if (!data.features || !data.features.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text--center">No active dispatches.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="py--20 title title--large">No active dispatches.</td></tr>';
             return;
         }
         data

@@ -1,4 +1,11 @@
-[*.js, *.html]
-tab_width = 2
+[*.js]
+indent_size = 2
+indent_style = space
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.html]
+indent_size = 2
+indent_style = space
 trim_trailing_whitespace = true
 insert_final_newline = true
