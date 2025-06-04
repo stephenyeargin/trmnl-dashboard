@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const tbody = document.getElementById('dispatch-tbody');
     tbody.innerHTML = '';
     if (!data.features || !data.features.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="py--20 title title--large">No active incidents.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="py--20"><span class="title">No active incidents.</span></td></tr>';
       return;
     }
     // Deduplicate by event_number and aggregate UNIT_IDs
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       .forEach(ev => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><span class="label label--small"><strong>${ev.incident_type_id || ''}</strong></span></td>
+          <td><span class="label label--small">${ev.incident_type_id || ''}</span></td>
           <td><span class="label label--small">${formatTime(ev.DispatchDateTime)}</span></td>
           <td><span class="label label--small">${ev.PostalCode || ''}</span></td>
           <td><span class="label label--small">${ev.UNIT_IDs.join(', ')}</span></td>

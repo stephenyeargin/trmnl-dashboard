@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const tbody = document.getElementById('dispatch-tbody');
         tbody.innerHTML = '';
         if (!data.features || !data.features.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="py--20 title title--large">No active dispatches.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="py--20"><span class="title">No active dispatches.</span></td></tr>';
             return;
         }
         data
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const p = f.properties;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-          <td><span class="label label--small"><strong>${p.IncidentTypeCode || ''}</strong></span></td>
+          <td><span class="label label--small">${p.IncidentTypeCode || ''}</span></td>
           <td><span class="description">${p.IncidentTypeName || ''}</span></td>
           <td><span class="label label--small text--center">${formatTime(p.CallReceivedTime)}</span></td>
           <td><span class="label label--small">${p.Location || ''}</span></td>
