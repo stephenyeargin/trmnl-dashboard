@@ -4,7 +4,7 @@
   "description": "A dashboard showing a route and next bus times at a set of stops.",
   "author": "Stephen Yeargin",
   "main": "index.html",
-  "icon": "https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/src/resources/logo.svg",
+  "icon": "https://raw.githubusercontent.com/stephenyeargin/termnl-dashboard/refs/heads/main/next-bus/assets/wego-bus-map.svg",
   "keywords": ["bus", "transit", "nashville"],
   "trmnlPlugin": true
 }
