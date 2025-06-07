@@ -1,0 +1,33 @@
+<div class="view">
+  <div class="layout layout--row">
+    <div class="column">
+      <table class="table table--condensed" id="dispatch-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>
+              <span class="label">Incident</span></th>
+            <th>
+              <span class="label">Reported</span></th>
+            <th>
+              <span class="label">Zip Code</span></th>
+            <th style="width: 50%">
+              <span class="label">Units Dispatched</span></th>
+          </tr>
+        </thead>
+        <tbody id="dispatch-tbody">
+          <tr>
+            <td colspan="5" class="text--center">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% render "table_javascript" count: 6, size: "wide" %}
+
+<script>
+  const data = {
+    features: {{ features | json }}
+  };
+  loadDispatches();
+</script>
