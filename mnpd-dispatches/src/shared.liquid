@@ -1,6 +1,5 @@
 {% template table_javascript %}
 <script>
-
   function formatTime(ts) {
     if (!ts)
       return '-';
@@ -9,7 +8,7 @@
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
-      timeZone: 'America/Chicago'
+      timeZone: '{{ trmnl.user.time_zone_iana }}'
     });
   }
   function loadDispatches() {
