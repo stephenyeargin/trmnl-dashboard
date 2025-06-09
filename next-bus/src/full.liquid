@@ -1,0 +1,72 @@
+<div class="view">
+  <!-- Alerts go here -->
+  <div id="alerts-list" class="richtext columns gap--none"></div>
+
+  <div class="layout layout--row">
+    <div class="stretch-y">
+
+      <div style="max-width: 450px">
+
+        <div class="item mb--4">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="label label--medium">Route</span>
+            <span
+              id="route-name"
+              class="value value--medium"
+              data-value-fit="true">-</span>
+          </div>
+        </div>
+        <div class="item mb--4">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="label label--medium">Stop</span>
+            <span
+              id="stop-name"
+              class="value value--small"
+              data-value-fit="true">{{ stop.stop_name | default: 'Stop Not Found' }}</span>
+          </div>
+        </div>
+        <div class="item mb--4">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="label label--medium">Next Trip</span>
+            <span
+              id="trip-name"
+              class="value value--small"
+              data-value-fit="true">-</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="label label--medium">Departs</span>
+            <span
+              id="departs"
+              class="value value--small"
+              data-value-fit="true">-</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="item">
+      <div
+        id="wego-map"
+        class="wego-map"
+        style="overflow: hidden;">
+        <div id="wego-map-canvas" style="width:300px; height:400px;">Loading ...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img
+      class="image"
+      src="https://raw.githubusercontent.com/stephenyeargin/trmnl-dashboard/refs/heads/main/next-bus/assets/wego-bus-map.svg"
+      width="28"
+      height="28" />
+    <span class="title">WeGo Public Transit Next Bus</span>
+    <span class="instance">map.transitnownash.org</span>
+  </div>
+</div>

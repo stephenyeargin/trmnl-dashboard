@@ -1,0 +1,230 @@
+{% comment %} https://gtfs.transitnownash.org/stops/{{ stop_id }}.json {% endcomment %}
+{% assign stop = IDX_0 %}
+{% comment %} https://gtfs.transitnownash.org/stops/{{ stop_id }}/trips.json?per_page=200 {% endcomment %}
+{% assign trips = IDX_1 %}
+{% comment %} https://gtfs.transitnownash.org/routes.json {% endcomment %}
+{% assign routes = IDX_2 %}
+{% comment %} https://gtfs.transitnownash.org/realtime/vehicle_positions.json {% endcomment %}
+{% assign vehicle_positions = IDX_3 %}
+{% comment %} https://gtfs.transitnownash.org/realtime/trip_updates.json {% endcomment %}
+{% assign trip_updates = IDX_4 %}
+{% comment %} https://gtfs.transitnownash.org/realtime/alerts.json {% endcomment %}
+{% assign alerts = IDX_5 %}
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin="" />
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+
+<script>
+  const BUS_MARKER_IMAGE = 'https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/public/logo192.png';
+
+  // https://gtfs.transitnownash.org/stops/{{ stop_id }}.json
+  const STOP = {{ stop | json }};
+  // https://gtfs.transitnownash.org/stops/{{ stop_id }}/trips.json?per_page=200
+  const TRIPS = {{ trips | json }};
+  // https://gtfs.transitnownash.org/routes.json
+  const ROUTES = {{ routes | json }};
+  // https://gtfs.transitnownash.org/realtime/vehicle_positions.json
+  const VEHICLE_POSITIONS = {{ vehicle_positions | json }};
+  // https://gtfs.transitnownash.org/realtime/trip_updates.json
+  const TRIP_UPDATES = {{ trip_updates | json }};
+  // https://gtfs.transitnownash.org/realtime/alerts.json
+  const ALERTS = {{ alerts | json }};
+
+  /**
+   * Find Next Departure Time
+   */
+  const findNextDepartureTime = (stopTimes) => {
+    if (!Array.isArray(stopTimes)) return null;
+    const now = new Date();
+
+    for (const st of stopTimes) {
+      const depTime = parseTime(st.departure_time);
+      if (depTime && depTime > now) {
+        return depTime;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Parse Time (handles HH >= 24 for GTFS)
+   */
+  const parseTime = (timeStr) => {
+    if (!timeStr) return null;
+    const parts = timeStr.trim().split(":");
+    if (parts.length !== 3) return null;
+
+    const now = new Date();
+    let hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    const seconds = parseInt(parts[2], 10);
+
+    // GTFS times can be over 24:00:00
+    const daysToAdd = Math.floor(hours / 24);
+    hours = hours % 24;
+
+    const time = new Date(now);
+    time.setHours(hours);
+    time.setMinutes(minutes);
+    time.setSeconds(seconds);
+    time.setMilliseconds(0);
+    time.setDate(time.getDate() + daysToAdd);
+    return time;
+  }
+
+  /**
+   * Find Next Trip
+   */
+  const findNextTrip = (trips) => {
+    if (!Array.isArray(trips) || trips.length === 0) return null;
+    let soonestTrip = null;
+    let soonestTime = null;
+
+    for (const trip of trips) {
+      if (!trip.stop_times?.length) continue;
+      const depTime = findNextDepartureTime(trip.stop_times);
+      if (depTime && (!soonestTime || depTime < soonestTime)) {
+        soonestTrip = trip;
+        soonestTime = depTime;
+      }
+    }
+    return soonestTrip;
+  };
+
+  /**
+   * Format Time
+   */
+  formatTime = (date) => {
+    if (!date) return '';
+    const options = { hour: 'numeric', minute: '2-digit', hour12: true };
+    return date.toLocaleTimeString([], options).replace(/^0/, '');
+  };
+
+  /**
+   * Get Time Until
+   */
+  const getTimeUntil = (futureDate) => {
+    if (!futureDate) return '';
+    const now = new Date();
+    if (futureDate <= now) return '';
+
+    const diffMs = futureDate - now;
+    const min = Math.floor(diffMs / 60000);
+    const sec = Math.floor((diffMs % 60000) / 1000);
+    return min > 0 ? `${min} min` : `${sec} sec`;
+  }
+
+  /**
+   * Find Next Trip Update (handles GTFS-RT epoch seconds)
+   */
+  const findUpdatedNextDepartureTime = (nextTrip, stop, tripUpdates) => {
+    if (!nextTrip || !stop || !Array.isArray(tripUpdates)) return null;
+    const updatedTrip = tripUpdates.find((tu) => parseInt(tu.trip_update.trip.trip_id, 10) === parseInt(nextTrip.trip_gid, 10));
+    const updatedStopTime = updatedTrip?.trip_update.stop_time_update.find((ut) => ut.stop_id === stop.stop_gid);
+    const updateTime = updatedStopTime?.departure?.time;
+    // GTFS-RT times are in seconds since epoch
+    return updateTime ? new Date(updateTime * 1000) : null;
+  }
+
+  /**
+   * Format Delay (use ms for both, then convert to seconds)
+   */
+  const formatDelay = (scheduled, realtime) => {
+    if (!scheduled || !realtime) return 'scheduled';
+    const diffSec = Math.floor(realtime.getTime() / 1000) - Math.floor(scheduled.getTime() / 1000);
+    if (Math.abs(diffSec) < 60) return 'on time';
+    const min = Math.round(Math.abs(diffSec) / 60);
+    return diffSec > 0 ? `${min} min late` : `${min} min early`;
+  }
+
+  /**
+   * Create Route Line
+   */
+  const createRouteLine = (shape, color) => {
+    const formattedShapePoints = shape.points.map((s) => {
+      return [s.lat, s.lon];
+    })
+
+    return L.polyline(formattedShapePoints, {smooth: true, color, weight: 8});
+  }
+
+  /**
+   * Main Loop
+   */
+  document.addEventListener('DOMContentLoaded', async function () {
+    const nextTripContainer = document.getElementById('trip-name');
+    const routeContainer = document.getElementById('route-name');
+    const departsContainer = document.getElementById('departs');
+
+    const nextTrip = findNextTrip(TRIPS.data);
+    if (!nextTrip) {
+      nextTripContainer.innerHTML = 'No more trips for today';
+      routeContainer.innerHTML = '';
+      departsContainer.innerHTML = '';
+      return;
+    }
+    const nextRoute = ROUTES.data.find((r) => r.route_gid === nextTrip.route_gid) || {};
+    const scheduledStopTime = findNextDepartureTime(nextTrip.stop_times);
+    const updatedStopTime = findUpdatedNextDepartureTime(nextTrip, STOP, TRIP_UPDATES.data);
+
+    nextTripContainer.innerHTML = nextTrip.trip_headsign || 'No more trips for today';
+    routeContainer.innerHTML = `${nextRoute.route_short_name || ''} - ${nextRoute.route_long_name || ''}`;
+    departsContainer.innerHTML = `
+      <div>${formatTime(scheduledStopTime)}</div>
+      <div class="label label--small">In ${getTimeUntil(scheduledStopTime)} (${formatDelay(scheduledStopTime, updatedStopTime)})</div>
+    `;
+
+    const mapContainer = document.getElementById('wego-map-canvas');
+    if (mapContainer) {
+      // Remove any previous map instance
+      if (window.transitMap && window.transitMap.remove) {
+        window.transitMap.remove();
+      }
+      window.transitMap = L.map('wego-map-canvas', {
+        center: [36.1627, -86.7816], // Nashville
+        zoom: 12,
+        zoomControl: false,
+        attributionControl: true
+      });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(window.transitMap);
+
+      // Add trip route to map
+      const routeShape = createRouteLine(nextTrip.shape, `#${nextRoute.route_color}`);
+      routeShape.addTo(window.transitMap);
+      window.transitMap.fitBounds(routeShape.getBounds());
+
+      // Add stop marker to map
+      L.circleMarker([parseFloat(STOP.stop_lat), parseFloat(STOP.stop_lon)], {
+          radius: 8,
+          color: '#fff',
+          weight: 3,
+          fillColor: '#000',
+          fillOpacity: 1
+      }).addTo(window.transitMap);
+
+      // Add bus marker to map, if found
+      const vehicle = VEHICLE_POSITIONS.data.find((vp) => vp.vehicle?.trip?.trip_id === nextTrip.trip_gid);
+      if (vehicle) {
+        L.marker([parseFloat(vehicle.vehicle.position.latitude), parseFloat(vehicle.vehicle.position.longitude)], {
+            icon: L.icon({
+                iconUrl: BUS_MARKER_IMAGE,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+            }),
+            zIndexOffset: 1000
+        }).addTo(window.transitMap);
+      }
+
+    }
+  });
+</script>
