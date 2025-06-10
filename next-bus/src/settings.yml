@@ -4,13 +4,7 @@ no_screen_padding: 'no'
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
-polling_url: |
-  https://gtfs.transitnownash.org/stops/{{ stop_id }}.json
-  https://gtfs.transitnownash.org/stops/{{ stop_id }}/trips.json?per_page=200
-  https://gtfs.transitnownash.org/routes.json
-  https://gtfs.transitnownash.org/realtime/vehicle_positions.json
-  https://gtfs.transitnownash.org/realtime/trip_updates.json
-  https://gtfs.transitnownash.org/realtime/alerts.json
+polling_url: "https://gtfs.transitnownash.org/stops/{{ stop_id }}.json\r\nhttps://gtfs.transitnownash.org/stops/{{ stop_id }}/trips.json?per_page=200\r\nhttps://gtfs.transitnownash.org/routes.json\r\nhttps://gtfs.transitnownash.org/realtime/vehicle_positions.json\r\nhttps://gtfs.transitnownash.org/realtime/trip_updates.json\r\nhttps://gtfs.transitnownash.org/realtime/alerts.json\r\n"
 polling_headers: ''
 id: 91940
 custom_fields:

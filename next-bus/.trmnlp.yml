@@ -8,9 +8,13 @@ watch:
 
 # values of custom fields (defined in src/settings.yml)
 custom_fields: {
-  stop_id: SHE19SEN
+  stop_id: GXOGREEN
 }
 
 # override variables
 variables:
-  trmnl: {}
+  trmnl: {
+    user: {
+      time_zone_iana: 'America/Chicago'
+    }
+  }

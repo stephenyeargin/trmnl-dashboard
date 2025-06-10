@@ -22,6 +22,7 @@
   crossorigin=""></script>
 
 <script>
+  const TIME_ZONE = '{{ trmnl.user.time_zone_iana | default: 'America/Chicago' }}';
   const BUS_MARKER_IMAGE = 'https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/public/logo192.png';
 
   // https://gtfs.transitnownash.org/stops/{{ stop_id }}.json
@@ -62,6 +63,7 @@
     if (parts.length !== 3) return null;
 
     const now = new Date();
+    const userTime = new Date(now.toLocaleString('en-US', { timeZone: TIME_ZONE }));
     let hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10);
     const seconds = parseInt(parts[2], 10);
@@ -70,7 +72,7 @@
     const daysToAdd = Math.floor(hours / 24);
     hours = hours % 24;
 
-    const time = new Date(now);
+    const time = new Date(userTime);
     time.setHours(hours);
     time.setMinutes(minutes);
     time.setSeconds(seconds);
@@ -103,8 +105,12 @@
    */
   formatTime = (date) => {
     if (!date) return '';
-    const options = { hour: 'numeric', minute: '2-digit', hour12: true };
-    return date.toLocaleTimeString([], options).replace(/^0/, '');
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: TIME_ZONE
+    }).replace(/^0/, '');
   };
 
   /**
@@ -113,9 +119,10 @@
   const getTimeUntil = (futureDate) => {
     if (!futureDate) return '';
     const now = new Date();
-    if (futureDate <= now) return '';
+    const userNow = new Date(now.toLocaleString('en-US', { timeZone: TIME_ZONE }));
+    if (futureDate <= userNow) return '';
 
-    const diffMs = futureDate - now;
+    const diffMs = futureDate - userNow;
     const min = Math.floor(diffMs / 60000);
     const sec = Math.floor((diffMs % 60000) / 1000);
     return min > 0 ? `${min} min` : `${sec} sec`;
@@ -129,8 +136,9 @@
     const updatedTrip = tripUpdates.find((tu) => parseInt(tu.trip_update.trip.trip_id, 10) === parseInt(nextTrip.trip_gid, 10));
     const updatedStopTime = updatedTrip?.trip_update.stop_time_update.find((ut) => ut.stop_id === stop.stop_gid);
     const updateTime = updatedStopTime?.departure?.time;
-    // GTFS-RT times are in seconds since epoch
-    return updateTime ? new Date(updateTime * 1000) : null;
+    if (!updateTime) return null;
+    const utcDate = new Date(updateTime * 1000);
+    return new Date(utcDate.toLocaleString('en-US', { timeZone: TIME_ZONE }));
   }
 
   /**
@@ -156,6 +164,45 @@
   }
 
   /**
+   * Process and Display Alerts
+   */
+  const processAlerts = (alerts, routeId, stopId) => {
+    const alertsList = document.getElementById('alerts-list');
+    if (!alertsList || !Array.isArray(alerts)) return;
+
+    const relevantAlerts = alerts.filter(alert => {
+      if (!alert.alert) return false;
+
+      // Check if alert applies to this route
+      const routeMatch = alert.alert.informed_entity?.some(entity =>
+        entity.route_id === routeId
+      );
+
+      // Check if alert applies to this stop
+      const stopMatch = alert.alert.informed_entity?.some(entity =>
+        entity.stop_id === stopId
+      );
+
+      return routeMatch || stopMatch;
+    });
+
+    if (relevantAlerts.length === 0) {
+      alertsList.style.display = 'none';
+      return;
+    }
+
+    alertsList.style.display = 'block';
+    alertsList.innerHTML = relevantAlerts.map(alert => `
+      <div class="bg--black text--white p--2 mb--4">
+        <div class="title title--small clamp--2" style="word-break: break-word;">${alert.alert.header_text?.translation?.[0]?.text || 'Service Alert'}</div>
+        <div class="description clamp--2" style="word-break: break-word;">
+          ${alert.alert.description_text?.translation?.[0]?.text || 'No description available'}
+        </div>
+      </div>
+    `).join('');
+  };
+
+  /**
    * Main Loop
    */
   document.addEventListener('DOMContentLoaded', async function () {
@@ -174,11 +221,17 @@
     const scheduledStopTime = findNextDepartureTime(nextTrip.stop_times);
     const updatedStopTime = findUpdatedNextDepartureTime(nextTrip, STOP, TRIP_UPDATES.data);
 
+    // Process and display alerts
+    processAlerts(ALERTS.data, nextRoute.route_gid, STOP.stop_gid);
+
     nextTripContainer.innerHTML = nextTrip.trip_headsign || 'No more trips for today';
     routeContainer.innerHTML = `${nextRoute.route_short_name || ''} - ${nextRoute.route_long_name || ''}`;
+
+    // Use updated time if available, otherwise fall back to scheduled time
+    const displayTime = updatedStopTime || scheduledStopTime;
     departsContainer.innerHTML = `
-      <div>${formatTime(scheduledStopTime)}</div>
-      <div class="label label--small">In ${getTimeUntil(scheduledStopTime)} (${formatDelay(scheduledStopTime, updatedStopTime)})</div>
+      <div>${formatTime(displayTime)}</div>
+      <div class="label label--small">In ${getTimeUntil(displayTime)}${updatedStopTime ? ` (${formatDelay(scheduledStopTime, updatedStopTime)})` : ''}</div>
     `;
 
     const mapContainer = document.getElementById('wego-map-canvas');

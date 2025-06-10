@@ -1,1 +1,49 @@
-quadrant!
+<div class="view">
+  <div class="layout layout--row">
+    <div class="grid grid--cols-1">
+      <div class="col col--span-1">
+
+        <div class="item mb--2">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="label label--small">Route</span>
+            <span
+              id="route-name"
+              class="value value--xxsmall"
+              data-value-fit="true">-</span>
+          </div>
+        </div>
+        <div class="item mb--2">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="label label--small">Stop</span>
+            <span
+              id="stop-name"
+              class="value value--xxsmall"
+              data-value-fit="true">{{ stop.stop_name | default: 'Stop Not Found' }}</span>
+          </div>
+        </div>
+        <div class="item mb--2">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="label label--small">Next Trip</span>
+            <span
+              id="trip-name"
+              class="value--xxsmall"
+              data-value-fit="true">-</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="label label--small">Departs</span>
+            <span
+              id="departs"
+              class="value value--xxsmall"
+              data-value-fit="true">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
