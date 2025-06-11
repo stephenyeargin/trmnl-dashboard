@@ -20,8 +20,16 @@
   src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
   crossorigin=""></script>
+<script src="https://unpkg.com/dayjs@1.11.10/dayjs.min.js"></script>
+<script src="https://unpkg.com/dayjs@1.11.10/plugin/utc.js"></script>
+<script src="https://unpkg.com/dayjs@1.11.10/plugin/timezone.js"></script>
+<script>
+  dayjs.extend(dayjs_plugin_utc);
+  dayjs.extend(dayjs_plugin_timezone);
+</script>
 
 <script>
+  const CURRENT_TIME = {{ trmnl.system.timestamp_utc }};
   const TIME_ZONE = '{{ trmnl.user.time_zone_iana | default: 'America/Chicago' }}';
   const BUS_MARKER_IMAGE = 'https://raw.githubusercontent.com/transitnownash/wego-bus-map/refs/heads/main/public/logo192.png';
 
@@ -38,32 +46,17 @@
   // https://gtfs.transitnownash.org/realtime/alerts.json
   const ALERTS = {{ alerts | json }};
 
-  /**
-   * Find Next Departure Time
-   */
-  const findNextDepartureTime = (stopTimes) => {
-    if (!Array.isArray(stopTimes)) return null;
-    const now = new Date();
-
-    for (const st of stopTimes) {
-      const depTime = parseTime(st.departure_time);
-      if (depTime && depTime > now) {
-        return depTime;
-      }
-    }
-    return null;
-  }
+  // Use CURRENT_TIME as the baseline for "now" (in UTC)
+  const BASE_NOW = dayjs.unix(CURRENT_TIME).tz(TIME_ZONE);
 
   /**
-   * Parse Time (handles HH >= 24 for GTFS)
+   * Parse Time (handles HH >= 24 for GTFS, always in local stop time zone)
    */
   const parseTime = (timeStr) => {
     if (!timeStr) return null;
     const parts = timeStr.trim().split(":");
     if (parts.length !== 3) return null;
 
-    const now = new Date();
-    const userTime = new Date(now.toLocaleString('en-US', { timeZone: TIME_ZONE }));
     let hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10);
     const seconds = parseInt(parts[2], 10);
@@ -72,14 +65,28 @@
     const daysToAdd = Math.floor(hours / 24);
     hours = hours % 24;
 
-    const time = new Date(userTime);
-    time.setHours(hours);
-    time.setMinutes(minutes);
-    time.setSeconds(seconds);
-    time.setMilliseconds(0);
-    time.setDate(time.getDate() + daysToAdd);
-    return time;
-  }
+    // Use BASE_NOW as the reference date in the correct time zone
+    const base = BASE_NOW.add(daysToAdd, 'day');
+    // Construct the time in the stop's local time zone
+    return dayjs.tz(
+      `${base.format('YYYY-MM-DD')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+      TIME_ZONE
+    );
+  };
+
+  /**
+   * Find Next Departure Time
+   */
+  const findNextDepartureTime = (stopTimes) => {
+    if (!Array.isArray(stopTimes)) return null;
+    for (const st of stopTimes) {
+      const depTime = parseTime(st.departure_time);
+      if (depTime && depTime.isAfter(BASE_NOW)) {
+        return depTime;
+      }
+    }
+    return null;
+  };
 
   /**
    * Find Next Trip
@@ -103,14 +110,9 @@
   /**
    * Format Time
    */
-  formatTime = (date) => {
+  const formatTime = (date) => {
     if (!date) return '';
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-      timeZone: TIME_ZONE
-    }).replace(/^0/, '');
+    return date.tz(TIME_ZONE).format('h:mm A');
   };
 
   /**
@@ -118,15 +120,11 @@
    */
   const getTimeUntil = (futureDate) => {
     if (!futureDate) return '';
-    const now = new Date();
-    const userNow = new Date(now.toLocaleString('en-US', { timeZone: TIME_ZONE }));
-    if (futureDate <= userNow) return '';
-
-    const diffMs = futureDate - userNow;
-    const min = Math.floor(diffMs / 60000);
-    const sec = Math.floor((diffMs % 60000) / 1000);
-    return min > 0 ? `${min} min` : `${sec} sec`;
-  }
+    if (!futureDate.isAfter(BASE_NOW)) return '';
+    const diffMin = futureDate.diff(BASE_NOW, 'minute');
+    const diffSec = futureDate.diff(BASE_NOW, 'second') % 60;
+    return diffMin > 0 ? `${diffMin} min` : `${diffSec} sec`;
+  };
 
   /**
    * Find Next Trip Update (handles GTFS-RT epoch seconds)
@@ -137,16 +135,15 @@
     const updatedStopTime = updatedTrip?.trip_update.stop_time_update.find((ut) => ut.stop_id === stop.stop_gid);
     const updateTime = updatedStopTime?.departure?.time;
     if (!updateTime) return null;
-    const utcDate = new Date(updateTime * 1000);
-    return new Date(utcDate.toLocaleString('en-US', { timeZone: TIME_ZONE }));
-  }
+    return dayjs.unix(updateTime).tz(TIME_ZONE);
+  };
 
   /**
    * Format Delay (use ms for both, then convert to seconds)
    */
   const formatDelay = (scheduled, realtime) => {
     if (!scheduled || !realtime) return 'scheduled';
-    const diffSec = Math.floor(realtime.getTime() / 1000) - Math.floor(scheduled.getTime() / 1000);
+    const diffSec = realtime.unix() - scheduled.unix();
     if (Math.abs(diffSec) < 60) return 'on time';
     const min = Math.round(Math.abs(diffSec) / 60);
     return diffSec > 0 ? `${min} min late` : `${min} min early`;
