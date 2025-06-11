@@ -190,7 +190,7 @@
 
     alertsList.style.display = 'block';
     alertsList.innerHTML = relevantAlerts.map(alert => `
-      <div class="bg--black text--white p--2 mb--4">
+      <div class="bg--black text--white p--2 mb--2">
         <div class="title title--small clamp--2" style="word-break: break-word;">${alert.alert.header_text?.translation?.[0]?.text || 'Service Alert'}</div>
         <div class="description clamp--2" style="word-break: break-word;">
           ${alert.alert.description_text?.translation?.[0]?.text || 'No description available'}
@@ -200,12 +200,53 @@
   };
 
   /**
+   * Get Upcoming Departures for Stop (excluding current next trip)
+   * Returns array of { trip, scheduled, updated, effectiveTime }
+   * Improved: checks all stop_times for each trip, includes if either scheduled or updated is after BASE_NOW
+   */
+  const getUpcomingDeparturesForStop = (trips, stop, tripUpdates, excludeTripGid, count = 2) => {
+    const departures = [];
+    const stopGidToMatch = stop.stop_gid;
+    trips.forEach(trip => {
+      if (!Array.isArray(trip.stop_times)) return;
+      trip.stop_times.forEach(st => {
+        if (st.stop_gid != stopGidToMatch) return;
+        const scheduled = parseTime(st.departure_time);
+        const updated = findUpdatedNextDepartureTime(trip, { stop_id: st.stop_id }, tripUpdates);
+        let effectiveTime = null;
+        if (updated && scheduled) {
+          effectiveTime = updated.isAfter(scheduled) ? updated : scheduled;
+        } else if (updated) {
+          effectiveTime = updated;
+        } else if (scheduled) {
+          effectiveTime = scheduled;
+        }
+        if (
+          effectiveTime &&
+          effectiveTime.isAfter(BASE_NOW) &&
+          String(trip.trip_gid) !== String(excludeTripGid)
+        ) {
+          const route = ROUTES.data.find((r) => r.route_gid === trip.route_gid);
+          departures.push({ trip, route, scheduled, updated, effectiveTime });
+        }
+      });
+    });
+    departures.sort((a, b) => a.effectiveTime.unix() - b.effectiveTime.unix());
+    return departures.slice(0, count);
+  };
+
+  const formatFutureTrip = (dep) => {
+    return `<div class="value value--xxsmall">${formatTime(dep.updated || dep.scheduled)}: ${dep.route.route_short_name} - ${dep.route.route_long_name}</div>`;
+  };
+
+  /**
    * Main Loop
    */
   document.addEventListener('DOMContentLoaded', async function () {
     const nextTripContainer = document.getElementById('trip-name');
     const routeContainer = document.getElementById('route-name');
     const departsContainer = document.getElementById('departs');
+    const futureContainer = document.getElementById('future');
 
     const nextTrip = findNextTrip(TRIPS.data);
     if (!nextTrip) {
@@ -230,6 +271,19 @@
       <div>${formatTime(displayTime)}</div>
       <div class="label label--small">In ${getTimeUntil(displayTime)}${updatedStopTime ? ` (${formatDelay(scheduledStopTime, updatedStopTime)})` : ''}</div>
     `;
+
+    // Show next two upcoming departures after the current next trip
+    const upcoming = getUpcomingDeparturesForStop(TRIPS.data, STOP, TRIP_UPDATES.data, nextTrip.trip_gid, 2);
+    if (upcoming.length > 0 && futureContainer) {
+      futureContainer.innerHTML = `
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <div class="label label--small">Future Trips</div>
+            ${upcoming.map((dep) => formatFutureTrip(dep)).join('')}
+          </div>
+        </div>`;
+    }
 
     const mapContainer = document.getElementById('wego-map-canvas');
     if (mapContainer) {
