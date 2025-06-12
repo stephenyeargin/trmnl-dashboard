@@ -1,36 +1,26 @@
-// Basic plugin initialization for TRMNL Dashboard
-// Extend this as needed for TRMNL API integration or custom logic
+<script src="https://usetrmnl.com/js/1.1.0/plugins.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/pattern-fill.js"></script>
 
+<script>
 document.addEventListener('DOMContentLoaded', function () {
-  // Render rows of Pollen Table
-  const renderPollenTable = (pollen) => {
-    if (!pollen) return;
-
-    const tbody = document.getElementById('pollen-tbody');
-    tbody.innerHTML = '';
-    pollen.slice(1, 6).forEach((row) => {
-      const tr = document.createElement('tr');
-      const date = new Date(row.properties?.ReportDateTime);
-      tr.innerHTML = `
-        <td><span class="title title--small">${date.toLocaleDateString('en-US')}</span></td>
-        <td class="text--center"><span class="value value--small value--tnums" data-value-format="true">${row.properties?.PollenCount}</span></td>
-        <td><span class="title title--small">${row.properties?.PollenType}, ${row.properties?.PollenDescription}</span></td>
-        <td class="text--center"><span class="value value--small value--tnums" data-value-format="true">${row.properties?.AQI}</span></td>
-        <td><span class="title title--small">${row.properties?.Category}</span></td>
-        <td><span class="title title--small">${row.properties?.ResponsiblePollutant}</span></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
   function renderGauge(container, value, max, label) {
+    // Destroy previous chart if it exists
+    if (Highcharts.charts) {
+      Highcharts.charts.forEach(chart => {
+        if (chart && chart.renderTo && chart.renderTo.id === container) {
+          chart.destroy();
+        }
+      });
+    }
     Highcharts.chart(container, {
       accessibility: {
         enabled: false, // not necessary for TRMNL
       },
       chart: {
         type: "gauge",
-        height: 120,
+        height: 140,
         backgroundColor: "transparent"
       },
       title: null,
@@ -103,13 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const renderTopMetrics = (pollen) => {
     if (!pollen) return;
 
-    const pollenType = document.getElementById('metric-pollen-type');
     const todaysMetrics = pollen[0];
-    const forecastHeading = document.getElementById('forecast-heading');
-    const date = new Date(todaysMetrics.properties?.ReportDateTime);
-    forecastHeading.textContent = `Pollen and air quality report for ${date.toLocaleDateString('en-US')}`;
-
-    pollenType.innerHTML = `${todaysMetrics.properties?.PollenType}, ${todaysMetrics.properties?.PollenDescription}`;
 
     // Render gauges
     renderGauge(
@@ -126,17 +110,15 @@ document.addEventListener('DOMContentLoaded', function () {
     );
   };
 
-  fetch('https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Air_Quality_and_Pollen_Count_1/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson')
-    .then(response => response.json())
-    .then(data => {
-      // Sort by ReportDateTime in descending order
-      data.features.sort((a, b) => new Date(b.properties.ReportDateTime) - new Date(a.properties.ReportDateTime));
+  const data = {
+    features: {{ features | json }}
+  };
 
-      window.pollen = data.features;
-      renderTopMetrics(data.features);
-      renderPollenTable(data.features);
-    })
-    .catch(error => {
-      console.error('Error fetching pollen count:', error);
-    });
+  // Sort by ReportDateTime in descending order
+  data.features.sort((a, b) => new Date(b.properties.ReportDateTime) - new Date(a.properties.ReportDateTime));
+
+  window.pollen = data.features;
+  renderTopMetrics(data.features);
 });
+
+</script>

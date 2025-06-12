@@ -1,0 +1,65 @@
+<div class="view">
+  <div class="layout layout--top">
+    <div class="stretch-y">
+
+      <div class="flex pb--4" style="flex-direction: column; align-items: center;">
+        <h2 class="title text--center my--2">Nashville pollen and air quality report for {{ features.first.properties.ReportDateTime |  divided_by: 1000 | date: '%-m/%-d/%Y' }}</h2>
+        <div class="flex" style="width: 100%; justify-content: center;">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <div id="gauge-pollen-count" style="width:120px;height:120px;margin:0 auto;"></div>
+              <span class="label label--small">Pollen Count</span>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--medium py--4" data-value-fit="true">{{ features.first.properties.PollenType }}</span>
+              <span class="label label--small">Pollen Type</span>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <div id="gauge-aqi" style="width:120px;height:120px;margin:0 auto;"></div>
+              <span class="label label--small">Air Quality Index ({{ features.first.properties.Category }})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <table class="table table--condensed" id="pollen-table">
+        <thead>
+          <tr>
+            <th><span class="label">Date</span></th>
+            <th><span class="label text--center">Pollen Count</span></th>
+            <th><span class="label">Type</span></th>
+            <th><span class="label text--center">AQI</span></th>
+            <th><span class="label">&nbsp;</span></th>
+            <th><span class="label">Contributor</span></th>
+          </tr>
+        </thead>
+        <tbody id="pollen-tbody">
+          {% for row in features limit: 5, offset: 1 %}
+          <tr>
+            <td><span class="label label--small">{{ row.properties.ReportDateTime | divided_by: 1000 | date: '%-m/%-d/%Y' }}</span></td>
+            <td class="text--center"><span class="value value--xxsmall value--tnums" data-value-format="true">{{ row.properties.PollenCount }}</span></td>
+            <td><span class="label label--small">{{ row.properties.PollenType }}, {{ row.properties.PollenDescription }}</span></td>
+            <td class="text--center"><span class="value value--xxsmall value--tnums" data-value-format="true">{{ row.properties.AQI }}</span></td>
+            <td><span class="label label--small">{{ row.properties.Category }}</span></td>
+            <td><span class="label label--small">{{ row.properties.ResponsiblePollutant }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="title_bar">
+    <img class="image" src="https://raw.githubusercontent.com/stephenyeargin/trmnl-dashboard/refs/heads/main/pollen-aqi/assets/mnhd.png" width="28" height="28">
+    <span class="title">Nashville Pollen &amp; Air Quality</span>
+    <span class="instance">data.nashville.gov</span>
+  </div>
+</div>

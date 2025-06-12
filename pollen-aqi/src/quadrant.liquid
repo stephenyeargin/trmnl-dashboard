@@ -1,0 +1,27 @@
+<div class="view">
+  <div class="layout layout--top">
+    <div class="stretch-y">
+
+      <div class="flex pb--4" style="flex-direction: column; align-items: center;">
+        <h2 class="title text--center my--2">Report for {{ features.first.properties.ReportDateTime |  divided_by: 1000 | date: '%-m/%-d/%Y' }}</h2>
+        <div class="flex" style="width: 100%; justify-content: center;">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <div id="gauge-pollen-count" style="width:120px;height:120px;margin:0 auto;"></div>
+              <span class="label label--small">Pollen Count</span>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <div id="gauge-aqi" style="width:120px;height:120px;margin:0 auto;"></div>
+              <span class="label label--small">Air Quality Index ({{ features.first.properties.Category }})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

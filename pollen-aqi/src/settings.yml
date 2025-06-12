@@ -1,0 +1,11 @@
+---
+strategy: polling
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+polling_url: https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Air_Quality_and_Pollen_Count_1/FeatureServer/0/query?outFields=*&where=1%3D1&orderByFields=ReportDateTime%20desc&f=geojson
+polling_headers: ''
+id: 93912
+name: Nashville Pollen & Air Quality
+refresh_interval: 1440

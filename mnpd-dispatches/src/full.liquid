@@ -8,25 +8,31 @@
         <thead>
           <tr>
             <th style="width:5%">
-              <span class="label">&nbsp;</span>
+              <span class="label label--medium">&nbsp;</span>
             </th>
             <th>
-              <span class="label">Description</span>
+              <span class="label label--medium">Description</span>
             </th>
             <th style="width:15%">
-              <span class="label">Received</span></th>
+              <span class="label label--medium">Received</span></th>
             <th>
-              <span class="label">Location</span>
+              <span class="label label--medium">Location</span>
             </th>
             <th>
-              <span class="label">Zone</span>
+              <span class="label label--medium">Zone</span>
             </th>
           </tr>
         </thead>
-        <tbody id="dispatch-tbody">
+        <tbody>
+          {% for row in features, limit: 12 %}
           <tr>
-            <td colspan="5" class="text--center">Loading...</td>
+            <td><span class="label label--small">{{ row.properties.IncidentTypeCode }}</span></td>
+            <td><span class="description">{{ row.properties.IncidentTypeName }}</span></td>
+            <td><span class="label label--small text--center">{{ row.properties.CallReceivedTime | date: '%l:%M %p' }}</span></td>
+            <td><span class="label label--small">{{ row.properties.Location }}</span></td>
+            <td><span class="label label--small">{{ row.properties.CityName }}</span></td>
           </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -41,12 +47,3 @@
     <span class="instance">data.nashville.gov</span>
   </div>
 </div>
-
-{% render "table_javascript" count: 12, size: "wide", trmnl: trmnl %}
-
-<script>
-  const data = {
-    features: {{ features | json }}
-  };
-  loadDispatches();
-</script>
