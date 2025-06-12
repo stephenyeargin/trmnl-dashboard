@@ -7,8 +7,6 @@ polling_verb: get
 polling_url: https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Nashville_Fire_Department_Active_Incidents_view/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson
 polling_headers: ''
 id: 89850
-name: Nashville Fire Department Active Incidents
-refresh_interval: 15
 custom_fields:
 - keyname: author_bio
   name: About This Plugin
@@ -17,3 +15,5 @@ custom_fields:
   github_url: https://github.com/stephenyeargin/trmnl-dashboard
   learn_more_url: https://www.nashville.gov/departments/fire/operations-division/active-incidents
   email_address: stephen@yearg.in
+name: Nashville Fire Department Active Incidents
+refresh_interval: 15
