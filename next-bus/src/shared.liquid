@@ -236,7 +236,7 @@
   };
 
   const formatFutureTrip = (dep) => {
-    return `<div class="value value--xxsmall">${formatTime(dep.updated || dep.scheduled)}: ${dep.route.route_short_name} - ${dep.route.route_long_name}</div>`;
+    return `<div class="value value--xxsmall py--1">${formatTime(dep.updated || dep.scheduled)}: ${dep.route.route_short_name} - ${dep.route.route_long_name}</div>`;
   };
 
   /**
