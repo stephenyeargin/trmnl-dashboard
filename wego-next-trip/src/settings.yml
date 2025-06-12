@@ -20,5 +20,5 @@ custom_fields:
   name: Stop ID
   description: The code for the stop to monitor
   placeholder: PORGRESF
-name: WeGo Public Transit Next Bus
+name: WeGo Public Transit Schedule
 refresh_interval: 15
