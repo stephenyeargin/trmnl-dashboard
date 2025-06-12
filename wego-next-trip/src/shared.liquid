@@ -316,7 +316,7 @@
           fillOpacity: 1
       }).addTo(window.transitMap);
 
-      // Add bus marker to map, if found
+      // Add vehicle marker to map, if found
       const vehicle = VEHICLE_POSITIONS.data.find((vp) => vp.vehicle?.trip?.trip_id === nextTrip.trip_gid);
       if (vehicle) {
         L.marker([parseFloat(vehicle.vehicle.position.latitude), parseFloat(vehicle.vehicle.position.longitude)], {
