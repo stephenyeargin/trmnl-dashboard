@@ -9,3 +9,11 @@ polling_headers: ''
 id: 90541
 name: Metro Nashville Police Department Active Dispatches
 refresh_interval: 15
+custom_fields:
+- keyname: author_bio
+  name: About This Plugin
+  field_type: author_bio
+  description: Active dispatches for the Metro Nashville Police Department.
+  github_url: https://github.com/stephenyeargin/trmnl-dashboard
+  learn_more_url: https://www.nashville.gov/departments/police/online-resources/active-dispatches
+  email_address: stephen@yearg.in

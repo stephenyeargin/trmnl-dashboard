@@ -8,6 +8,13 @@ polling_url: "https://gtfs.transitnownash.org/stops/{{ stop_id }}.json\r\nhttps:
 polling_headers: ''
 id: 91940
 custom_fields:
+- keyname: author_bio
+  name: About This Plugin
+  field_type: author_bio
+  description: Displays the next bus for a given stop in Nashville, Tennessee. Find the code using the linked map.
+  github_url: https://github.com/stephenyeargin/trmnl-dashboard
+  learn_more_url: https://map.transitnownash.org/
+  email_address: stephen@yearg.in
 - keyname: stop_id
   field_type: string
   name: Stop ID

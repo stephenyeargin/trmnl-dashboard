@@ -9,3 +9,11 @@ polling_headers: ''
 id: 89850
 name: Nashville Fire Department Active Incidents
 refresh_interval: 15
+custom_fields:
+- keyname: author_bio
+  name: About This Plugin
+  field_type: author_bio
+  description: Active incidents for the Nashville Fire Department.
+  github_url: https://github.com/stephenyeargin/trmnl-dashboard
+  learn_more_url: https://www.nashville.gov/departments/fire/operations-division/active-incidents
+  email_address: stephen@yearg.in
