@@ -161,45 +161,6 @@
   }
 
   /**
-   * Process and Display Alerts
-   */
-  const processAlerts = (alerts, routeId, stopId) => {
-    const alertsList = document.getElementById('alerts-list');
-    if (!alertsList || !Array.isArray(alerts)) return;
-
-    const relevantAlerts = alerts.filter(alert => {
-      if (!alert.alert) return false;
-
-      // Check if alert applies to this route
-      const routeMatch = alert.alert.informed_entity?.some(entity =>
-        entity.route_id === routeId
-      );
-
-      // Check if alert applies to this stop
-      const stopMatch = alert.alert.informed_entity?.some(entity =>
-        entity.stop_id === stopId
-      );
-
-      return routeMatch || stopMatch;
-    });
-
-    if (relevantAlerts.length === 0) {
-      alertsList.style.display = 'none';
-      return;
-    }
-
-    alertsList.style.display = 'block';
-    alertsList.innerHTML = relevantAlerts.map(alert => `
-      <div class="bg--black text--white p--2 mb--2">
-        <div class="title title--small clamp--2" style="word-break: break-word;">${alert.alert.header_text?.translation?.[0]?.text || 'Service Alert'}</div>
-        <div class="description clamp--2" style="word-break: break-word;">
-          ${alert.alert.description_text?.translation?.[0]?.text || 'No description available'}
-        </div>
-      </div>
-    `).join('');
-  };
-
-  /**
    * Get Upcoming Departures for Stop (excluding current next trip)
    * Returns array of { trip, scheduled, updated, effectiveTime }
    * Improved: checks all stop_times for each trip, includes if either scheduled or updated is after BASE_NOW
@@ -240,6 +201,52 @@
   };
 
   /**
+   * Process and Display Alerts (show only the first relevant alert)
+   */
+  const processAlerts = (alerts, routeId, stopId) => {
+    const alertsList = document.getElementById('alerts-list');
+    if (!alertsList || !Array.isArray(alerts)) return;
+
+    // Find the first relevant alert
+    const nowUnix = dayjs().unix();
+    const foundAlert = alerts.find(alert => {
+      if (!alert.alert) return false;
+      // Check if alert is active
+      const isActive = Array.isArray(alert.alert.active_period) && alert.alert.active_period.some(period => {
+        return period.start && period.start <= nowUnix && (!period.end || period.end > nowUnix);
+      });
+      if (!isActive) return false;
+      // Check if alert applies to this route or stop
+      const informed = alert.alert.informed_entity || [];
+      const appliesToRoute = informed.some(entity => entity.route_id && String(entity.route_id) === String(routeId));
+      const appliesToStop = informed.some(entity => entity.stop_id && String(entity.stop_id) === String(stopId));
+      return appliesToRoute || appliesToStop;
+    });
+
+    if (!foundAlert) {
+      alertsList.style.display = 'none';
+      return;
+    }
+    alertsList.style.display = 'block';
+    alertsList.innerHTML = `
+      <div class="bg--black text--white p--2 mb--2" style="display: flex; align-items: flex-start;">
+        <div style="flex: 0 0 28px; display: flex; align-items: center; justify-content: center; height: 100%;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 19,18 1,18" fill="white" stroke="#222" stroke-width="1.5"/>
+            <text x="10" y="15" text-anchor="middle" font-size="13" font-family="Arial, sans-serif" fill="#222" font-weight="bold">!</text>
+          </svg>
+        </div>
+        <div style="flex: 1 1 0; min-width: 0; margin-left: 0.75em;">
+          <div class="title title--small clamp--2" style="word-break: break-word;">${foundAlert.alert.header_text?.translation?.[0]?.text || 'Service Alert'}</div>
+          <div class="description clamp--2" style="word-break: break-word;">
+            ${foundAlert.alert.description_text?.translation?.[0]?.text || 'No description available'}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  /**
    * Main Loop
    */
   document.addEventListener('DOMContentLoaded', async function () {
@@ -249,18 +256,15 @@
     const futureContainer = document.getElementById('future');
 
     const nextTrip = findNextTrip(TRIPS.data);
+    const nextRoute = ROUTES.data.find((r) => r.route_gid === nextTrip?.route_gid) || {};
     if (!nextTrip) {
       nextTripContainer.innerHTML = 'No more trips for today';
       routeContainer.innerHTML = '';
       departsContainer.innerHTML = '';
       return;
     }
-    const nextRoute = ROUTES.data.find((r) => r.route_gid === nextTrip.route_gid) || {};
     const scheduledStopTime = findNextDepartureTime(nextTrip.stop_times);
     const updatedStopTime = findUpdatedNextDepartureTime(nextTrip, STOP, TRIP_UPDATES.data);
-
-    // Process and display alerts
-    processAlerts(ALERTS.data, nextRoute.route_gid, STOP.stop_gid);
 
     nextTripContainer.innerHTML = nextTrip.trip_headsign || 'No more trips for today';
     routeContainer.innerHTML = `${nextRoute.route_short_name || ''} - ${nextRoute.route_long_name || ''}`;
@@ -284,6 +288,9 @@
           </div>
         </div>`;
     }
+
+    // Process and display only one alert
+    processAlerts(ALERTS.data, nextRoute.route_gid, STOP.stop_gid);
 
     const mapContainer = document.getElementById('wego-map-canvas');
     if (mapContainer) {
