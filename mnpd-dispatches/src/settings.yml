@@ -4,7 +4,7 @@ no_screen_padding: 'no'
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
-polling_url: 'https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Metro_Nashville_Police_Department_Active_Dispatch_Table_view/FeatureServer/0/query?f=json&cacheHint=true&resultOffset=0&resultRecordCount=50&where=1%3D1&orderByFields=LastUpdated%20ASC%2CObjectId%20ASC&outFields=*&returnGeometry=false&spatialRel=esriSpatialRelIntersects'
+polling_url: https://services2.arcgis.com/HdTo6HJqh92wn4D8/arcgis/rest/services/Metro_Nashville_Police_Department_Active_Dispatch_Table_view/FeatureServer/0/query?f=json&cacheHint=true&resultOffset=0&resultRecordCount=50&where=1%3D1&orderByFields=LastUpdated%20ASC%2CObjectId%20ASC&outFields=*&returnGeometry=false&spatialRel=esriSpatialRelIntersects
 polling_headers: ''
 id: 90541
 custom_fields:

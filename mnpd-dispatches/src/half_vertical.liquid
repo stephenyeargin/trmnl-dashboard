@@ -20,9 +20,13 @@
         <tbody id="dispatch-tbody">
           {% for row in features, limit: 12 %}
           <tr>
-            <td><span class="description">{{ row.properties.IncidentTypeName }}</span></td>
-            <td><span class="label label--small text--center">{{ row.properties.CallReceivedTime | date: '%l:%M %p' }}</span></td>
-            <td><span class="label label--small">{{ row.properties.Location }}</span></td>
+            <td><span class="description">{{ row.attributes.IncidentTypeName }}</span></td>
+            <td><span class="label label--small text--center">{{ row.attributes.CallReceivedTime | date: '%l:%M %p' }}</span></td>
+            <td><span class="label label--small">{{ row.attributes.Location }}</span></td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="3"><span class="label label--large py--40">No active incidents</span></td>
           </tr>
           {% endfor %}
         </tbody>
