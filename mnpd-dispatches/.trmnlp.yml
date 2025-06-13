@@ -11,4 +11,10 @@ custom_fields: {}
 
 # override variables
 variables:
-  trmnl: {}
+  trmnl: {
+    user: {
+      time_zone: Central Time (US & Canada),
+      time_zone_iana: America/Chicago,
+      utc_offset: -18000
+    }
+  }

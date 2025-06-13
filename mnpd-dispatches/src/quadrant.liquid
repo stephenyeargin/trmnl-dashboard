@@ -22,7 +22,7 @@
           {% for row in features, limit: 6 %}
           <tr>
             <td><span class="description">{{ row.attributes.IncidentTypeName }}</span></td>
-            <td><span class="label label--small text--center">{{ row.attributes.CallReceivedTime | date: '%l:%M %p' }}</span></td>
+            <td><span class="label label--small text--center">{{ row.attributes.CallReceivedTime | divided_by: 1000 | date: "%s" | plus: trmnl.user.utc_offset | date: '%l:%M %p' }}</span></td>
             <td><span class="label label--small">{{ row.attributes.Location }}</span></td>
           </tr>
           {% else %}
