@@ -1,11 +1,3 @@
 # TRMNL Dashboards
 
-This repository provides live dashboards for Nashville public safety, transit data, and anything else that comes to mind.
-
-![wego-next-trip](wego-next-trip/assets/screenshot.png)
-
-![nfd-incidents](nfd-incidents/assets/screenshot.png)
-
-![mnpd-dispatches](mnpd-dispatches/assets/screenshot.png)
-
-![pollen-aqi](pollen-aqi/assets/screenshot.png)
+Original repository for my TRMNL dashboard plugins, now split into their own modules.
