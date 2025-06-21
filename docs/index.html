@@ -40,5 +40,20 @@
       <div class="overlay"></div>
     </div>
 
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const iframe = document.querySelector('iframe');
+        iframe.addEventListener('load', () => {
+          const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+          iframeDocument.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.tagName === 'A' && target.href) {
+              event.preventDefault();
+              window.location.href = target.href;
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>

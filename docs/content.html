@@ -97,5 +97,16 @@
         </div>
       </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.body.addEventListener('click', (event) => {
+          const target = event.target;
+          if (target.tagName === 'A' && target.href) {
+            event.preventDefault();
+            window.parent.location.href = target.href;
+          }
+        });
+      });
+    </script>
   </body>
 </html>
