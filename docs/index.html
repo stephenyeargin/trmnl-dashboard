@@ -4,56 +4,189 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>trmnl.stephenyeargin.dev</title>
+    <script src="./assets/trmnl-component.js" defer="defer"></script>
     <meta property="og:image" content="./assets/opengraph.png">
     <style>
       body {
-        background-color: #1f1f1f;
+        background-color: #606060;
+        color: white;
       }
-      .container {
-        position: relative;
+      h1 {
+        display: none;
       }
-      iframe {
-        position: absolute;
-        top: 85px;
-        left: 45px;
-        border: none;
-        z-index: 1;
-      }
-      .overlay {
-        position: absolute;
-        top: 85px;
-        left: 45px;
-        width: 800px;
-        height: 480px;
-        background-color: rgba(0, 0, 0, .1);
-        mix-blend-mode: multiply;
-        z-index: 2;
-        pointer-events: none;
+      #container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
       }
     </style>
   </head>
   <body>
+    <h1>TRMNL Dashboards by @stephenyeargin</h1>
+    <div id="container">
+      <trmnl-frame color="white">
+        <div class="screen">
+          <div class="view view--full">
+            <div class="layout layout--col gap--large">
+              <div class="grid grid--cols-2 gap--large">
 
-    <div class="container">
-      <img src="./assets/trmnl-frame.svg" width="890"/>
-      <iframe src="./content.html" width="800" height="480"></iframe>
-      <div class="overlay"></div>
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">Nashville Fire Department Active Incidents</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/89850" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-nfd-incidents" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-nfd-incidents</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">Metro Nashville Police Dept. Active Dispatches</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/90541" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-mnpd-dispatches" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-mnpd-dispatches</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">WeGo Public Transit Schedule</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/91940" target="_blank" rel="noopener noreferrer">Install</a>* |
+                        <a href="https://github.com/transitnownash/trmnl-wego-next-trip" target="_blank" rel="noopener noreferrer">@transitnownash/trmnl-wego-next-trip</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">Nashville Pollen & Air Quality</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/93912" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-nashville-pollen-aqi" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-nashville-pollen-aqi</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">Matomo Analytics</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/97234" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-matomo" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-matomo</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">BCycle</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/100262" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-bcycle" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-bcycle</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">UptimeRobot</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/98765" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-uptimerobot" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-uptimerobot</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">National Water Prediction Service Gauges</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/101750" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-nwps-gauges" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-nwps-gauges</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">Unifi Site Manager</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/102852" target="_blank" rel="noopener noreferrer">Install</a>* |
+                        <a href="https://github.com/stephenyeargin/trmnl-unifi-site-manager" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-unifi-site-manager</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">Pixelfed</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/103958" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-pixelfed" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-pixelfed</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">Tailscale</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/108109" target="_blank" rel="noopener noreferrer">Install</a>
+                        |
+                        <a href="https://github.com/stephenyeargin/trmnl-tailscale" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-tailscale</a>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div class="meta"></div>
+                    <div class="content">
+                      <span class="label">PBS Kids</span>
+                      <span class="description">
+                        <a href="https://usetrmnl.com/recipes/110655" target="_blank" rel="noopener noreferrer">Install</a>* |
+                        <a href="https://github.com/stephenyeargin/trmnl-pbs-kids" target="_blank" rel="noopener noreferrer">@stephenyeargin/trmnl-pbs-kids</a>
+                      </span>
+                    </div>
+                  </div>
+
+                </div>
+                <div>
+                  <span class="label label--small text--right">* Submitted, but may not yet be approved as a Recipe.</span>
+                </div>
+              </div>
+              <div class="title_bar">
+                <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg"/>
+                <span class="title">TRMNL Dashboards</span>
+                <span class="instance">trmnl.stephenyeargin.dev</span>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </trmnl-frame>
     </div>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const iframe = document.querySelector('iframe');
-        iframe.addEventListener('load', () => {
-          const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-          iframeDocument.addEventListener('click', (event) => {
-            const target = event.target;
-            if (target.tagName === 'A' && target.href) {
-              event.preventDefault();
-              window.location.href = target.href;
-            }
-          });
-        });
-      });
-    </script>
   </body>
 </html>
