@@ -6,14 +6,26 @@
     <title>trmnl.stephenyeargin.dev</title>
     <script src="./assets/trmnl-component.js" defer="defer"></script>
     <script src="./assets/main.js" defer="defer"></script>
+    <script src="https://kit.fontawesome.com/09b66f5b11.js" crossorigin="anonymous"></script>
     <meta property="og:image" content="./assets/opengraph.png">
     <style>
       body {
         background-color: #606060;
-        color: white;
+        font-family: sans-serif;
+        text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
       }
       h1 {
         display: none;
+      }
+      a:link {
+        color: blue;
+        text-decoration: none;
+      }
+      #credit {
+        text-align: right;
+        font-weight: bold;
+        padding: 5px;
+        text-outline: solid 1px #fff;
       }
       #container {
         display: flex;
@@ -40,6 +52,11 @@
   </head>
   <body>
     <h1>TRMNL Dashboards by @stephenyeargin</h1>
+    <div id="credit">
+      <a href="https://social.yearg.in/@stephenyeargin"><i class="fab fa-mastodon fa-fw"></i> @stephenyeargin</a>
+      &nbsp;&nbsp;&nbsp;
+      <a href="https://stephenyeargin.com"><i class="fa-solid fa-globe fa-fw"></i> stephenyeargin.com</a>
+    </div>
     <div id="container">
       <trmnl-frame color="white">
         <div class="screen">
