@@ -33,6 +33,15 @@
         align-items: center;
         min-height: 90vh;
       }
+      .stats {
+        font-size: 0.85em;
+        color: #555;
+        margin-top: 2px;
+      }
+      #loading {
+        text-align: center;
+        padding: 20px;
+      }
     </style>
     <!-- Matomo -->
     <script>
@@ -49,6 +58,101 @@
       })();
     </script>
     <!-- End Matomo Code -->
+    <script>
+      // Load and display recipes from local JSON file
+      async function loadRecipes() {
+        try {
+          const response = await fetch('./recipes.json');
+          const data = await response.json();
+
+          // Sort recipes by ID in ascending order (oldest first)
+          const recipes = data.data.sort((a, b) => a.id - b.id);
+
+          // Build the HTML content
+          let recipesHTML = '';
+          recipes.forEach(recipe => {
+            const githubUrl = recipe.author_bio?.github_url || '#';
+            const installs = recipe.stats?.installs || 0;
+            const forks = recipe.stats?.forks || 0;
+
+            recipesHTML += `
+              <div class="item">
+                <div class="meta"></div>
+                <div class="content">
+                  <span class="title title--small">${recipe.name}</span>
+                  <span class="description">
+                    <a href="https://usetrmnl.com/recipes/${recipe.id}" target="_blank" rel="noopener noreferrer">Install</a> |
+                    <a href="${githubUrl}" target="_blank" rel="noopener noreferrer">GitHub</a> |
+                    <i class="fa-solid fa-download"></i> ${installs} |
+                    <i class="fa-solid fa-code-fork"></i> ${forks}
+                  </span>
+                </div>
+              </div>
+            `;
+          });
+
+          // Create the complete content HTML
+          const contentHTML = `
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <div class="screen">
+              <div class="view view--full">
+                <div class="layout layout--col gap--small">
+                  <div class="grid grid--cols-2 gap--small mb--3">
+                    ${recipesHTML}
+                  </div>
+                  <div>
+                    <!-- <span class="label label--small text--right">* Submitted, but may not yet be approved as a Recipe.</span> -->
+                  </div>
+                </div>
+                <div class="title_bar">
+                  <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg"/>
+                  <span class="title">TRMNL Dashboards</span>
+                  <span class="instance">trmnl.stephenyeargin.dev</span>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Get the trmnl-frame element and set its HTML content
+          const frame = document.querySelector('trmnl-frame');
+          if (frame && frame.setHTML) {
+            frame.setHTML(contentHTML);
+            console.log(`Loaded ${recipes.length} recipes`);
+          } else {
+            console.error('TRMNL frame or setHTML method not found');
+          }
+        } catch (error) {
+          console.error('Error loading recipes:', error);
+        }
+      }
+
+      // Wait for both DOM and custom elements to be ready
+      if (customElements && customElements.whenDefined) {
+        Promise.all([
+          customElements.whenDefined('trmnl-frame'),
+          new Promise(resolve => {
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', resolve);
+            } else {
+              resolve();
+            }
+          })
+        ]).then(() => {
+          // Give the component extra time to fully initialize and render
+          setTimeout(loadRecipes, 500);
+        }).catch((err) => {
+          console.error('Error waiting for components:', err);
+          // Fallback to DOMContentLoaded
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadRecipes);
+          } else {
+            loadRecipes();
+          }
+        });
+      } else {
+        document.addEventListener('DOMContentLoaded', loadRecipes);
+      }
+    </script>
   </head>
   <body>
     <h1>TRMNL Dashboards by @stephenyeargin</h1>
@@ -58,225 +162,7 @@
       <a href="https://stephenyeargin.com"><i class="fa-solid fa-globe fa-fw"></i> stephenyeargin.com</a>
     </div>
     <div id="container">
-      <trmnl-frame color="white">
-        <div class="screen">
-          <div class="view view--full">
-            <div class="layout layout--col gap--small">
-              <div class="grid grid--cols-2 gap--small mb--3">
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Nashville Fire Department Active Incidents</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/89850" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-nfd-incidents" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Metro Nashville Police Active Dispatches</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/90541" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-mnpd-dispatches" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">WeGo Public Transit Schedule</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/91940" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/transitnownash/trmnl-wego-next-trip" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Nashville Pollen & Air Quality</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/93912" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-nashville-pollen-aqi" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Matomo Analytics</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/97234" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-matomo" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">BCycle</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/100262" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-bcycle" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">UptimeRobot</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/98765" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-uptimerobot" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">National Water Prediction Service Gauges</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/101750" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-nwps-gauges" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Unifi Site Manager</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/102852" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-unifi-site-manager" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Pixelfed</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/103958" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-pixelfed" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Tailscale</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/108109" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-tailscale" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">PBS Kids</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/110655" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-pbs-kids" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Nashville Electric Service (NES)</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/112378" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-nashville-electric-service" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Adafruit IO</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/112643" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-adafruit-io" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">SeatGeek</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/120686" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-seatgeek" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">New York Times Best Sellers</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/121924" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-nyt-best-sellers" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">Open Library</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/124200" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-open-library" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="item">
-                    <div class="meta"></div>
-                    <div class="content">
-                      <span class="title title--small">MealViewer</span>
-                      <span class="description">
-                        <a href="https://usetrmnl.com/recipes/133879" target="_blank" rel="noopener noreferrer">Install</a> |
-                        <a href="https://github.com/stephenyeargin/trmnl-mealviewer" target="_blank" rel="noopener noreferrer">GitHub</a>
-                      </span>
-                    </div>
-                  </div>
-
-                </div>
-                <div>
-                  <!-- <span class="label label--small text--right">* Submitted, but may not yet be approved as a Recipe.</span> -->
-                </div>
-              </div>
-              <div class="title_bar">
-                <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg"/>
-                <span class="title">TRMNL Dashboards</span>
-                <span class="instance">trmnl.stephenyeargin.dev</span>
-              </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </trmnl-frame>
+      <trmnl-frame color="white"></trmnl-frame>
     </div>
   </body>
 </html>
