@@ -13,7 +13,9 @@ def fetch_recipes():
     
     try:
         print(f"Fetching recipes from {url}...")
-        with urllib.request.urlopen(url) as response:
+        # Add User-Agent header to avoid 403 Forbidden errors
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response:
             data = json.loads(response.read().decode())
         
         # Ensure docs directory exists
