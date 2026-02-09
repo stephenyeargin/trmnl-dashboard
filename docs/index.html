@@ -76,25 +76,32 @@
           const response = await fetch('./recipes.json');
           const data = await response.json();
 
-          // Sort recipes by ID in ascending order (oldest first)
-          const recipes = data.data.sort((a, b) => a.id - b.id);
+          // Sort recipes by ID in ascending order (most popular first)
+          const recipes = data.data.sort((a, b) => {
+            const aTotal = a.stats?.installs + a.stats?.forks;
+            const bTotal = b.stats?.installs + b.stats?.forks;
+            return bTotal - aTotal;
+          });
 
           // Build the HTML content
           let recipesHTML = '';
-          recipes.forEach(recipe => {
+          recipes.forEach((recipe, i) => {
             const githubUrl = recipe.author_bio?.github_url || '#';
             const installs = recipe.stats?.installs || 0;
             const forks = recipe.stats?.forks || 0;
 
             recipesHTML += `
               <div class="item">
-                <div class="meta"></div>
+                <div class="meta">
+                  <span class="index">${i + 1}</span>
+                </div>
                 <div class="content">
-                  <span class="title title--small clamp--1" data-clamp="1">${truncate(recipe.name, 32)}</span>
+                  <span class="label label--small label--underline" data-clamp="1">${truncate(recipe.name, 32)}</span>
+                  <span class="description" data-clamp="1">${truncate(recipe.author_bio.description, 32)}</span>
                   <span class="description">
-                    <a href="https://usetrmnl.com/recipes/${recipe.id}" target="_blank" rel="noopener noreferrer">Install</a> |
+                    <a href="https://trmnl.com/recipes/${recipe.id}" target="_blank" rel="noopener noreferrer">Install</a> |
                     <a href="${githubUrl}" target="_blank" rel="noopener noreferrer">GitHub</a> |
-                    Installs: ${installs} |
+                    <!-- Connection: ${installs} | -->
                     Forks: ${forks}
                   </span>
                 </div>
@@ -108,7 +115,7 @@
             <div class="screen">
               <div class="view view--full">
                 <div class="layout layout--col gap--small layout--top">
-                  <div class="grid grid--cols-2 gap--small mb--3">
+                  <div class="grid grid--cols-3 gap--small">
                     ${recipesHTML}
                   </div>
                   <div>
@@ -116,7 +123,7 @@
                   </div>
                 </div>
                 <div class="title_bar">
-                  <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg"/>
+                  <img class="image" src="https://trmnl.com/images/plugins/trmnl--render.svg"/>
                   <span class="title">TRMNL Dashboards</span>
                   <span class="instance">trmnl.stephenyeargin.dev</span>
                 </div>

@@ -9,7 +9,7 @@ from pathlib import Path
 
 def fetch_recipes():
     """Fetch recipes from TRMNL API and save to docs/recipes.json"""
-    url = "https://usetrmnl.com/recipes.json?user_id=12119"
+    url = "https://trmnl.com/recipes.json?user_id=12119"
     
     try:
         print(f"Fetching recipes from {url}...")
