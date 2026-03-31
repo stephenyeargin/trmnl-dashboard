@@ -99,10 +99,9 @@
                   <span class="label label--small label--underline" data-clamp="1">${truncate(recipe.name, 32)}</span>
                   <span class="description" data-clamp="1">${truncate(recipe.author_bio.description, 32)}</span>
                   <span class="description">
-                    <a href="https://trmnl.com/recipes/${recipe.id}" target="_blank" rel="noopener noreferrer">Install</a> |
                     <a href="${githubUrl}" target="_blank" rel="noopener noreferrer">GitHub</a> |
-                    <!-- Connection: ${installs} | -->
-                    Forks: ${forks}
+                    <a href="https://trmnl.com/recipes/${recipe.id}" target="_blank" rel="noopener noreferrer">Install</a> (${installs}) |
+                    Forks (${forks})
                   </span>
                 </div>
               </div>
