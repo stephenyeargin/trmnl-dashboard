@@ -3,183 +3,39 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>trmnl.stephenyeargin.dev</title>
+    <title>TRMNL Dashboard Recipes</title>
+    <link rel="stylesheet" href="./assets/dashboard.css">
     <script src="./assets/trmnl-component.js" defer="defer"></script>
-    <script src="./assets/main.js" defer="defer"></script>
-    <script src="https://kit.fontawesome.com/09b66f5b11.js" crossorigin="anonymous"></script>
+    <script src="./assets/dashboard.js" defer="defer"></script>
     <meta property="og:image" content="./assets/opengraph.png">
-    <style>
-      body {
-        background-color: #606060;
-        font-family: sans-serif;
-        text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
-      }
-      h1 {
-        display: none;
-      }
-      a:link {
-        color: blue;
-        text-decoration: none;
-      }
-      #credit {
-        text-align: right;
-        font-weight: bold;
-        padding: 5px;
-        text-outline: solid 1px #fff;
-      }
-      #container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 90vh;
-      }
-      .stats {
-        font-size: 0.85em;
-        color: #555;
-        margin-top: 2px;
-      }
-      #loading {
-        text-align: center;
-        padding: 20px;
-      }
-    </style>
-    <!-- Matomo -->
-    <script>
-      var _paq = window._paq = window._paq || [];
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
-      (function() {
-        var u="https://analytics.yearg.in/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '13']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-      })();
-    </script>
-    <!-- End Matomo Code -->
-    <script>
-      const truncate = (string, length) => {
-        if (!length) {
-          return string;
-        }
-        let newString = string;
-        if (string.length > length) {
-          newString = string.slice(0, length) + '...';
-        }
-        return newString;
-      }
-
-      // Load and display recipes from local JSON file
-      async function loadRecipes() {
-        try {
-          const response = await fetch('./recipes.json');
-          const data = await response.json();
-
-          // Sort recipes by ID in ascending order (most popular first)
-          const recipes = data.data.sort((a, b) => {
-            const aTotal = a.stats?.installs + a.stats?.forks;
-            const bTotal = b.stats?.installs + b.stats?.forks;
-            return bTotal - aTotal;
-          });
-
-          // Build the HTML content
-          let recipesHTML = '';
-          recipes.forEach((recipe, i) => {
-            const githubUrl = recipe.author_bio?.github_url || '#';
-            const installs = recipe.stats?.installs || 0;
-            const forks = recipe.stats?.forks || 0;
-
-            recipesHTML += `
-              <div class="item">
-                <div class="meta">
-                  <span class="index">${i + 1}</span>
-                </div>
-                <div class="content">
-                  <span class="label label--small label--underline" data-clamp="1">${truncate(recipe.name, 32)}</span>
-                  <span class="description" data-clamp="1">${truncate(recipe.author_bio.description, 32)}</span>
-                  <span class="description">
-                    <a href="${githubUrl}" target="_blank" rel="noopener noreferrer">GitHub</a> |
-                    <a href="https://trmnl.com/recipes/${recipe.id}" target="_blank" rel="noopener noreferrer">Install</a> (${installs}) |
-                    Forks (${forks})
-                  </span>
-                </div>
-              </div>
-            `;
-          });
-
-          // Create the complete content HTML
-          const contentHTML = `
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-            <div class="screen">
-              <div class="view view--full">
-                <div class="layout layout--col gap--small layout--top">
-                  <div class="grid grid--cols-3 gap--small">
-                    ${recipesHTML}
-                  </div>
-                  <div>
-                    <!-- <span class="label label--small text--right">* Submitted, but may not yet be approved as a Recipe.</span> -->
-                  </div>
-                </div>
-                <div class="title_bar">
-                  <img class="image" src="https://trmnl.com/images/plugins/trmnl--render.svg"/>
-                  <span class="title">TRMNL Dashboards</span>
-                  <span class="instance">trmnl.stephenyeargin.dev</span>
-                </div>
-              </div>
-            </div>
-          `;
-
-          // Get the trmnl-frame element and set its HTML content
-          const frame = document.querySelector('trmnl-frame');
-          if (frame && frame.setHTML) {
-            frame.setHTML(contentHTML);
-            console.log(`Loaded ${recipes.length} recipes`);
-          } else {
-            console.error('TRMNL frame or setHTML method not found');
-          }
-        } catch (error) {
-          console.error('Error loading recipes:', error);
-        }
-      }
-
-      // Wait for both DOM and custom elements to be ready
-      if (customElements && customElements.whenDefined) {
-        Promise.all([
-          customElements.whenDefined('trmnl-frame'),
-          new Promise(resolve => {
-            if (document.readyState === 'loading') {
-              document.addEventListener('DOMContentLoaded', resolve);
-            } else {
-              resolve();
-            }
-          })
-        ]).then(() => {
-          // Give the component extra time to fully initialize and render
-          setTimeout(loadRecipes, 500);
-        }).catch((err) => {
-          console.error('Error waiting for components:', err);
-          // Fallback to DOMContentLoaded
-          if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadRecipes);
-          } else {
-            loadRecipes();
-          }
-        });
-      } else {
-        document.addEventListener('DOMContentLoaded', loadRecipes);
-      }
-    </script>
   </head>
   <body>
-    <h1>TRMNL Dashboards by @stephenyeargin</h1>
-    <div id="credit">
-      <a href="https://social.yearg.in/@stephenyeargin"><i class="fab fa-mastodon fa-fw"></i> @stephenyeargin</a>
-      &nbsp;&nbsp;&nbsp;
-      <a href="https://stephenyeargin.com"><i class="fa-solid fa-globe fa-fw"></i> stephenyeargin.com</a>
-    </div>
-    <div id="container">
-      <trmnl-frame color="white"></trmnl-frame>
-    </div>
+    <main>
+      <h1 class="hidden">Stephen Yeargin's TRMNL Plugins</h1>
+      <trmnl-frame color="white" aria-label="Selected recipe preview"></trmnl-frame>
+      <div id="status" aria-live="polite"></div>
+      <section id="table-panel" aria-label="Recipe statistics table">
+        <div id="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Recipe</th>
+                <th>Installs</th>
+                <th>Forks</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="recipes-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <div id="credit">
+        <a href="https://social.yearg.in/@stephenyeargin" rel="me">@stephenyeargin@yearg.in</a>
+        <span> | </span>
+        <a href="https://stephenyeargin.com" rel="me">stephenyeargin.com</a>
+      </div>
+    </main>
   </body>
 </html>

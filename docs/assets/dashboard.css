@@ -1,0 +1,160 @@
+:root {
+  --page-bg: #526469;
+  --panel-bg: rgba(246, 247, 244, 0.93);
+  --text-color: #102327;
+  --muted-color: #4f666a;
+  --border-color: rgba(16, 35, 39, 0.18);
+  --active-bg: #d7e6d2;
+  --hover-bg: #ecf3ea;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text-color);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(194, 216, 218, 0.38), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(243, 221, 177, 0.22), transparent 32%),
+    linear-gradient(160deg, #4a5d61 0%, #60777f 50%, #3d4f53 100%);
+  font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px 14px 26px;
+}
+
+h1 {
+  display: none;
+}
+
+trmnl-frame {
+  margin-top: 14px;
+  display: block;
+  width: 100%;
+}
+
+#status {
+  margin-top: 10px;
+  color: var(--panel-bg);
+  font-size: 0.83rem;
+}
+
+#table-panel {
+  margin-top: 14px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--panel-bg);
+  box-shadow: 0 18px 40px rgba(8, 17, 19, 0.28);
+}
+
+#table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+thead th {
+  text-align: left;
+  color: var(--muted-color);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 8px;
+}
+
+tbody td {
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px 8px;
+  vertical-align: top;
+}
+
+tbody tr {
+  transition: background-color 120ms ease;
+}
+
+tbody tr:hover {
+  background: var(--hover-bg);
+}
+
+tbody tr.active {
+  background: var(--active-bg);
+}
+
+tbody tr[role="button"] {
+  cursor: pointer;
+}
+
+.recipe-name {
+  font-weight: 600;
+}
+
+.recipe-description {
+  color: var(--muted-color);
+  margin-top: 2px;
+  font-size: 0.8rem;
+}
+
+.table-link {
+  color: #0f3f7f;
+  font-weight: 600;
+}
+
+.preview-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#credit {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #eaf3f1;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+#credit a {
+  color: #f8fffe;
+}
+
+@media (max-width: 740px) {
+  main {
+    padding: 12px 8px 20px;
+  }
+
+  #table-panel {
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  table {
+    font-size: 0.82rem;
+  }
+
+  tbody td,
+  thead th {
+    padding: 8px 6px;
+  }
+}
