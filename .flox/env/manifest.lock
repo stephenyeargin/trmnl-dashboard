@@ -7,9 +7,8 @@
         "pkg-path": "python3"
       }
     },
-    "hook": {},
-    "profile": {
-      "common": "  echo \"\"\n  echo \"🌐 TRMNL Dashboard Development Environment\"\n  echo \"\"\n  echo \"To start the dev server:\"\n  echo \"  flox services start dev\"\n  echo \"\"\n  echo \"Then visit: http://localhost:8000\"\n  echo \"\"\n"
+    "hook": {
+      "on-activate": "  echo \"\"\n  echo \"🌐 TRMNL Dashboard Development Environment\"\n  echo \"\"\n  echo \"To start the dev server:\"\n  echo \"  flox services start dev\"\n  echo \"\"\n  echo \"Then visit: http://localhost:8000\"\n  echo \"\"\n"
     },
     "options": {},
     "services": {
