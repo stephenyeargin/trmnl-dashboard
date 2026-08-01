@@ -6,7 +6,7 @@ import json
 import urllib.request
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 
 USER_AGENT = {"User-Agent": "Mozilla/5.0"}
@@ -57,9 +57,15 @@ def fetch_recipes():
     url = "https://trmnl.com/recipes.json?user_id=12119"
     
     try:
-        print(f"Fetching recipes from {url}...")
-        data = fetch_json(url)
-        
+        recipes = []
+        page_url = url
+        while page_url:
+            print(f"Fetching recipes from {page_url}...")
+            data = fetch_json(page_url)
+            recipes.extend(data.get("data", []))
+            next_page_url = data.get("next_page_url")
+            page_url = urljoin(page_url, next_page_url) if next_page_url else None
+
         # Ensure docs directory exists
         docs_dir = Path(__file__).parent / "docs"
         docs_dir.mkdir(exist_ok=True)
@@ -72,7 +78,6 @@ def fetch_recipes():
             if existing_file.is_file():
                 existing_file.unlink()
 
-        recipes = data.get("data", [])
         cached_count = 0
         for recipe in recipes:
             screenshot_url = recipe.get("screenshot_url")
@@ -95,7 +100,7 @@ def fetch_recipes():
         # Write to docs/recipes.json
         output_file = docs_dir / "recipes.json"
         with open(output_file, "w") as f:
-            json.dump(data, f, indent=2)
+            json.dump({"data": recipes, "total": len(recipes)}, f, indent=2)
         
         print(
             f"✓ Successfully saved {len(recipes)} recipes to {output_file} "

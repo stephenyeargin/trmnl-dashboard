@@ -66,9 +66,17 @@
       .map(function (recipe, index) {
         var totals = recipeTotals(recipe);
         var description =
-          (recipe.author_bio && recipe.author_bio.description) || "";
+          recipe.description ||
+          (recipe.author_bio && recipe.author_bio.description) ||
+          "";
         var github = (recipe.author_bio && recipe.author_bio.github_url) || "";
         var trmnl = "https://trmnl.com/recipes/" + recipe.id;
+        var categories = ((recipe.author_bio && recipe.author_bio.category) || "")
+          .split(",")
+          .map(function (category) {
+            return category.trim();
+          })
+          .filter(Boolean);
 
         return [
           '<tr role="button" tabindex="0" data-recipe-id="' +
@@ -82,6 +90,19 @@
           '<div class="recipe-description">' +
             escapeHtml(description) +
             "</div>",
+          categories.length
+            ? '<div class="recipe-categories">' +
+              categories
+                .map(function (category) {
+                  return (
+                    '<span class="category-badge">' +
+                    escapeHtml(category) +
+                    "</span>"
+                  );
+                })
+                .join("") +
+              "</div>"
+            : "",
           "</td>",
           "<td>" + totals.installs + "</td>",
           "<td>" + totals.forks + "</td>",

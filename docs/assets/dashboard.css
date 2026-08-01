@@ -106,6 +106,22 @@ tbody tr[role="button"] {
   font-size: 0.8rem;
 }
 
+.recipe-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.category-badge {
+  color: var(--muted-color);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
 .table-link {
   color: #0f3f7f;
   font-weight: 600;
